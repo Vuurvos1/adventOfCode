@@ -1,5 +1,20 @@
 import fs from 'node:fs';
 
+let d = 1;
+const getDice = () => {
+  let val = 0;
+  for (let i = 0; i < 3; i++) {
+    val += d;
+    d++;
+
+    if (d > 100) {
+      d = 1;
+    }
+  }
+
+  return val;
+};
+
 async function main() {
   const inputFile = fs.readFileSync('input.txt', 'utf8');
   // const input = inputFile.split('\r\n').slice(0, -1);
@@ -10,37 +25,27 @@ async function main() {
   // let p1 = 5;
   // let p2 = 6;
 
-  let p1 = { pos: 4, score: 0 };
-  let p2 = { pos: 8, score: 0 };
+  let p1 = { pos: 5, score: 0 };
+  let p2 = { pos: 6, score: 0 };
 
   let rolls = 0;
 
-  let dice = 1;
-
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < 100000; i++) {
     if (i % 2 == 0) {
-      p1.pos = (p1.pos + dice) % 10;
-      p1.score += p1.pos;
-      // p1 += dice;
+      rolls += 3;
+      movePlayer(p1, getDice());
     } else {
-      p2.pos = (p2.pos + dice) % 10;
-      p2.score += p2.pos;
-      // p2 += dice;
+      rolls += 3;
+      movePlayer(p2, getDice());
     }
 
     if (p1.score >= 1000) {
-      break;
+      return rolls * p2.score;
     }
 
-    rolls++;
-
-    dice++;
-    if (dice > 100) {
-      dice = 1;
+    if (p2.score >= 1000) {
+      return rolls * p1.score;
     }
-
-    // dice++;
-    // dice = dice > 100 ? 100 : 1;
   }
 
   console.log(p1, p2, rolls);
@@ -49,3 +54,9 @@ async function main() {
 }
 
 console.log(await main());
+
+function movePlayer(p, dice) {
+  const move = (p.pos + dice) % 10;
+  p.pos = move == 0 ? 10 : move;
+  p.score += p.pos;
+}

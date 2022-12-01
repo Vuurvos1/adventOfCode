@@ -6,15 +6,17 @@ async function main() {
 
   input = input.map((el) => el.split('\r\n').map((x) => Number(x)));
 
-  const out = input.map((el) =>
+  let out = input.map((el) =>
     el.reduce((curr, prev) => prev + Number(curr), 0)
   );
 
+  out = out.sort((a, b) => b - a);
+
   console.log(out);
 
-  console.log(Math.max(...out));
+  // console.log(Math.max(...out));
 
-  return 0;
+  return out[0] + out[1] + out[2];
 }
 
 console.log(await main());

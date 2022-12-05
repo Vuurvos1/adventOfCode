@@ -31,7 +31,6 @@ async function main() {
   console.log(cratesIn, crates, moves);
 
   for (const move of moves.split('\n')) {
-    // console.log(move.split(' '));
     let [a, amount, b, from, c, to] = move.split(' ');
     amount = Number(amount);
     from = Number(from);
@@ -39,11 +38,14 @@ async function main() {
 
     // console.log(amount, from, to);
 
-    for (let i = 0; i < amount; i++) {
-      // console.log(crates, from);
-      const crate = crates[from - 1].pop();
-      crates[to - 1].push(crate);
-    }
+    // for (let i = 0; i < amount; i++) {
+    console.log(crates[from - 1]);
+    let crate = crates[from - 1].slice(amount - 1, -1);
+    crates[from - 1].splice(amount.length - amount - 1, amount.length - 1);
+    console.log(crates[from - 1], crate, from);
+    // console.log(crate);
+    crates[to - 1].push(...crate);
+    // }
 
     // console.log(crates);
   }

@@ -3,13 +3,10 @@ import fs from 'node:fs';
 const inputFile = fs.readFileSync('input.txt', 'utf8');
 let input = inputFile.split('\n').slice(0, -1);
 
-// input = input.map((input) => input.split('').map(Number));
-console.log(input);
-
-let out = 0;
 let head = { x: 0, y: 0 };
 let tail = { x: 0, y: 0 };
 const moveSet = new Set();
+moveSet.add(`${head.x},${head.y}`);
 
 const moveTail = () => {
   // touching
@@ -61,4 +58,4 @@ for (const move of input) {
   }
 }
 
-console.log('out', moveSet.size + 1);
+console.log('out', moveSet.size);

@@ -13,29 +13,11 @@ const manhattanDist = (a, b) => {
 };
 
 const points = []; // aka sensors
-const beacons = [];
 
 for (const inp of input) {
   let split = inp.split(' ');
   points.push({ x: extractNum(split[2]), y: extractNum(split[3]) });
-  beacons.push({ x: extractNum(split[8]), y: extractNum(split[9]) });
 }
-
-let minX = 0;
-let maxX = 0;
-let minY = 0;
-let maxY = 0;
-
-for (let i = 0; i < points.length; i++) {
-  points[i].dist = manhattanDist(points[i], beacons[i]);
-
-  minX = Math.min(minX, points[i].x - points[i].dist - 1);
-  maxX = Math.max(maxX, points[i].x + points[i].dist + 1);
-  minY = Math.min(minY, points[i].y - points[i].dist - 1);
-  maxY = Math.max(maxY, points[i].y + points[i].dist + 1);
-}
-
-console.log(minX, minY, maxX, maxY);
 
 const intersecting = (point) => {
   for (const sensor of points) {
@@ -44,8 +26,6 @@ const intersecting = (point) => {
   }
   return false;
 };
-
-let out = 0;
 
 // for (let i = 0; i < 1; i++) {
 for (const point of points) {

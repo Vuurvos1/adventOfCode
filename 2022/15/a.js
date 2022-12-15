@@ -38,12 +38,6 @@ for (let i = 0; i < points.length; i++) {
 
 let out = 0;
 
-// 4746004 LOW
-// 6697770 HIGH
-// 6087854
-// 6620058
-// 4748135 p1
-
 const y = points.length < 15 ? 10 : 2000000;
 for (let x = minX - 1; x < maxX + 1; x++) {
   let inRange = false;

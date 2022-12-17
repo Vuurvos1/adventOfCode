@@ -1,16 +1,53 @@
 import fs from 'node:fs';
 
 const input = fs.readFileSync('input.txt', 'utf8').split('').slice(0, -1);
-console.log(input.length);
+console.log(input.length, input.slice(-10));
 
 let pieceIndex = 0;
+
 const pieces = [
-  ['####'],
-  ['.#.', '###', '.#.'],
-  ['###', '..#', '..#'],
-  ['#', '#', '#', '#'],
-  ['##', '##'],
+  [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [3, 0],
+  ],
+  [
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [2, 1],
+    [1, 2],
+  ],
+  [
+    [2, 2],
+    [2, 1],
+    [2, 0],
+    [1, 0],
+    [0, 0],
+  ],
+  [
+    [0, 0],
+    [0, 1],
+    [0, 2],
+    [0, 3],
+  ],
+  [
+    [0, 0],
+    [0, 1],
+    [1, 0],
+    [1, 1],
+  ],
 ];
+
+// const pieces = [
+//   ['####'],
+//   ['.#.', '###', '.#.'],
+//   ['###', '..#', '..#'],
+//   ['#', '#', '#', '#'],
+//   ['##', '##'],
+// ];
+
 const piecePos = { x: 0, y: 0 }; // 0, 0 left bottom
 
 let topStack = 0;
@@ -19,20 +56,25 @@ const cave = [];
 const collision = (pos, piece) => {
   // oob
   if (pos.x < 0 || pos.y < 0) {
+    console.log('wall / floor oob');
     return true;
   }
 
-  if (pos.x + piece[0].length > 7) {
-    return true;
-  }
+  // if (pos.x + piece[0].length > 7) {
+  //   return true;
+  // }
 
   // stone coll
-  for (let i = 0; i < piece.length; i++) {
-    for (let j = 0; j < piece[0].length; j++) {
-      // console.log(cave, pos, i, j);
-      if (piece[i][j] === '#' && cave[pos.y + i][pos.x + j] === '#') {
-        return true;
-      }
+  for (let i = piece.length - 1; i >= 0; i--) {
+    const [x, y] = piece[i];
+    if (pos.x + x > 6) {
+      console.log('wall oob');
+      return true;
+    }
+
+    if (cave[pos.y + y][pos.x + x] === '#') {
+      console.log('hit rock');
+      return true;
     }
   }
 
@@ -40,8 +82,8 @@ const collision = (pos, piece) => {
 };
 
 let i = 0;
-// for (let j = 0; j < 2024; j++) {
-for (let j = 0; j < 10; j++) {
+for (let j = 0; j < 2022; j++) {
+  // for (let j = 0; j < 2; j++) {
   piecePos.x = 2;
   piecePos.y = topStack + 3;
 
@@ -54,12 +96,6 @@ for (let j = 0; j < 10; j++) {
   }
 
   while (true) {
-    // const caveCopy = JSON.parse(JSON.stringify(cave));
-    // for (let k = 0; k < 4; k++) {
-    //   caveCopy[piecePos.y][piecePos.x + k] = '@';
-    // }
-
-    // console.log(piecePos.y);
     if (input[i] === '>') {
       // console.log('right');
       piecePos.x++;
@@ -74,14 +110,19 @@ for (let j = 0; j < 10; j++) {
       }
     }
 
-    i++;
-    if (i > input.length - 1) i = 0;
+    // console.log(i);
+    i = (i + 1) % input.length;
+
+    // i++;
+    // if (i > input.length - 1) {
+    //   i = 0;
+    // }
     // console.log(i);
 
-    const caveCopy = JSON.parse(JSON.stringify(cave));
-    for (let k = 0; k < 4; k++) {
-      caveCopy[piecePos.y][piecePos.x + k] = '@';
-    }
+    // const caveCopy = JSON.parse(JSON.stringify(cave));
+    // for (let k = 0; k < 4; k++) {
+    //   caveCopy[piecePos.y][piecePos.x + k] = '@';
+    // }
 
     // console.log(
     //   caveCopy
@@ -104,19 +145,21 @@ for (let j = 0; j < 10; j++) {
 
       // console.log('set at', piecePos);
       for (let i = 0; i < piece.length; i++) {
-        for (let j = 0; j < piece[0].length; j++) {
-          // console.log(i, j);
-          if (piece[i][j] === '#') {
-            cave[piecePos.y + i][piecePos.x + j] = '#';
-          }
-        }
+        const [x, y] = piece[i];
+        cave[piecePos.y + y][piecePos.x + x] = '#';
+        // for (let j = 0; j < piece[0].length; j++) {
+        // console.log(i, j);
+        // if (piece[i][j] === '#') {
+        //   cave[piecePos.y + i][piecePos.x + j] = '#';
+        // }
+        // }
       }
 
       // console.log(piece);
-      topStack = piecePos.y + piece.length;
+      // topStack = piecePos.y + piece.length;
+      topStack = cave.filter((row) => row.includes('#')).length;
 
-      pieceIndex++;
-      if (pieceIndex > pieces.length - 1) pieceIndex = 0;
+      pieceIndex = (pieceIndex + 1) % pieces.length;
       break;
     } else {
       //
@@ -140,4 +183,9 @@ console.log(
         )}| some filler to wrap text`
     )
 );
-console.log(cave.filter((row) => row.includes('#')).length);
+
+console.log(
+  cave.filter((row) => row.includes('#')).length
+  // topStack + 3,
+  // cave.length - 3
+);

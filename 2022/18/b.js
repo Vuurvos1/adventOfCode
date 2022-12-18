@@ -1,8 +1,16 @@
 import fs from 'node:fs';
 
-const input = fs.readFileSync('input.txt', 'utf8').split('\n').slice(0, -1);
+const input = fs
+  .readFileSync('input.txt', 'utf8')
+  .split('\n')
+  .slice(0, -1)
+  .map((cord) => cord.split(',').map(Number));
 
-const size = 50;
+const size = input.reduce((prev, curr) => Math.max(prev, ...curr), 0) + 3;
+
+// 0 nothing
+// 1 air
+// 2 cube
 
 const space = [];
 for (let i = 0; i < size; i++) {
@@ -15,17 +23,12 @@ for (let i = 0; i < size; i++) {
 }
 
 for (const inp of input) {
-  const [x, y, z] = inp.split(',');
-  // offset by 1 to fill around
-  space[Number(x) + 1][Number(y) + 1][Number(z) + 1] = 2;
+  const [x, y, z] = inp;
+  // offset by 1 to fill around the droplet
+  space[x + 1][y + 1][z + 1] = 2;
 }
 
-let sides = 0;
-
-// mark surounding air spaces using a flood fill
-let stack = [[size - 1, size - 1, size - 1]];
-
-let dirs = [
+const dirs = [
   [1, 0, 0],
   [-1, 0, 0],
   [0, 1, 0],
@@ -33,6 +36,9 @@ let dirs = [
   [0, 0, 1],
   [0, 0, -1],
 ];
+
+// mark surounding air spaces using a flood fill
+const stack = [[size - 1, size - 1, size - 1]];
 
 // this is very slow but whatever
 while (stack.length > 0) {
@@ -48,43 +54,22 @@ while (stack.length > 0) {
   }
 }
 
-// 0 nothing
-// 1 air
-// 2 cube
+let sides = 0;
 
 // counting area
-for (let i = 0; i < size; i++) {
-  for (let j = 0; j < size; j++) {
-    for (let k = 0; k < size; k++) {
-      if (space[i][j][k] !== 2) continue;
+for (let x = 0; x < size; x++) {
+  for (let y = 0; y < size; y++) {
+    for (let z = 0; z < size; z++) {
+      if (space[x][y][z] !== 2) continue;
 
-      if (space?.[i + 1]?.[j]?.[k] === 1) {
-        sides++;
-      }
-
-      if (space?.[i - 1]?.[j]?.[k] === 1) {
-        sides++;
-      }
-
-      if (space?.[i]?.[j + 1]?.[k] === 1) {
-        sides++;
-      }
-
-      if (space?.[i]?.[j - 1]?.[k] === 1) {
-        sides++;
-      }
-
-      if (space?.[i]?.[j]?.[k + 1] === 1) {
-        sides++;
-      }
-
-      if (space?.[i]?.[j]?.[k - 1] === 1) {
-        sides++;
+      for (const dir of dirs) {
+        const [dx, dy, dz] = dir;
+        if (space?.[x + dx]?.[y + dy]?.[z + dz] === 1) {
+          sides++;
+        }
       }
     }
   }
 }
-
-// 4320
 
 console.log(sides);

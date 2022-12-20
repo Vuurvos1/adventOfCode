@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 const inputFile = fs.readFileSync('input.txt', 'utf8');
-let input = inputFile.split('\n').slice(0, -1);
+let input = inputFile.trim().split('\n');
 
 // {
 //   valve: string
@@ -87,23 +87,25 @@ function dfs(curr, time, total, open, next) {
 
   for (const n of next) {
     // skip open valves
-    if (open.find((o) => o.name === n.name)) return;
+    // console.log(!!open.find((o) => o.name === n.name));
+    if (open.find((o) => o.name === n.name)) continue; // why did I think returns would work here??
 
     // skip if unreachable in remaining time
-    const dt = distMap[curr.name][n.name] + 1;
-    if (time + dt >= totalTime) return;
+    const dist = distMap[curr.name][n.name] + 1;
+    // console.log(time + dist >= totalTime, time, time + dist, totalTime);
+    if (time + dist >= totalTime) continue;
 
     // move to valve and open
-    const newTotal = total + dt * totalRate(open);
+    const newTotal = total + dist * totalRate(open);
     open.push(n);
-    const value = dfs(n, time + dt, newTotal, open, next);
+    const value = dfs(n, time + dist, newTotal, open, next);
 
-    // reset
-    max = Math.max(max, value);
+    max = Math.max(value, max);
     const nextIndex = open.findIndex((o) => o.name === n.name);
     open.splice(nextIndex, 1);
   }
 
+  // console.log(max);
   return max;
 }
 

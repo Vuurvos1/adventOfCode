@@ -15,8 +15,6 @@ for (let y = 0; y < input.length; y++) {
   }
 }
 
-console.log(board.size);
-
 // way to debug and print board
 const print = (elves) => {
   let minX = +Infinity;
@@ -42,16 +40,13 @@ const print = (elves) => {
   }
 };
 
-// print(board);
-// console.log(' ');
-
 let dirs = ['n', 's', 'w', 'e'];
 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 1_000_000; i++) {
   const moves = new Map();
+  let moved = false;
 
   for (const elf of board) {
-    // console.log(board.size);
     let [x, y] = elf.split(',').map((x) => Number(x));
 
     let n = `${x},${y - 1}`;
@@ -70,11 +65,8 @@ for (let i = 0; i < 10; i++) {
 
     if (!(N || S || W || E || NE || NW || SE || SW)) continue;
 
-    // console.log(elf, N, NE, E, SE, S, SW, W, NW);
-
     for (const dir of dirs) {
       if (dir === 'n' && !N && !NE && !NW) {
-        // console.log('m n');
         // elf collision
         if (moves.has(n)) {
           moves.delete(n);
@@ -83,45 +75,50 @@ for (let i = 0; i < 10; i++) {
         else {
           moves.set(n, elf);
         }
+
+        moved = true;
         break;
       }
 
       if (dir === 's' && !S && !SE && !SW) {
-        // console.log('m s');
         if (moves.has(s)) {
           moves.delete(s);
         } else {
           moves.set(s, elf);
         }
+        moved = true;
 
         break;
       }
 
       if (dir === 'w' && !W && !NW && !SW) {
-        // console.log('m s');
         if (moves.has(w)) {
           moves.delete(w);
         } else {
           moves.set(w, elf);
         }
+        moved = true;
 
         break;
       }
 
       if (dir === 'e' && !E && !NE && !SE) {
-        // console.log('m e');
         if (moves.has(e)) {
           moves.delete(e);
         } else {
           moves.set(e, elf);
         }
+        moved = true;
 
         break;
       }
     }
   }
 
-  // console.log(moves);
+  if (moves.size === 0) {
+    console.log('final move', i + 1);
+    break;
+  }
 
   moves.forEach((value, key) => {
     board.delete(value);
@@ -135,22 +132,3 @@ for (let i = 0; i < 10; i++) {
   // print(board);
   // console.log(' ');
 }
-
-let minx = +Infinity;
-let miny = +Infinity;
-let maxx = -Infinity;
-let maxy = -Infinity;
-for (const elf of board) {
-  const [x, y] = elf.split(',').map((x) => Number(x));
-  minx = Math.min(minx, x);
-  miny = Math.min(miny, y);
-  maxx = Math.max(maxx, x);
-  maxy = Math.max(maxy, y);
-}
-
-console.log(board.size);
-
-const boardTiles = Math.abs(maxx - minx + 1) * Math.abs(maxy - miny + 1);
-const groundTiles = boardTiles - board.size;
-
-console.log('end', groundTiles);

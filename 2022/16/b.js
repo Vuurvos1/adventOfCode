@@ -24,7 +24,6 @@ const nodes = input.map((inp) => {
 
 // use the floyd warshall algorithem to generate shortest distances between valves/nodes
 // dfs
-//
 // valves with 0 flow rate (appart from the starting node) could be simplified out
 // and be added as extra travel time between valves/nodes,
 // less nodes -> less complecity -> more speed
@@ -74,7 +73,6 @@ const distMap = createDistMap(nodes);
 // total
 // next
 
-// let totalTime = 30;
 let flowValves = nodes.filter((n) => n.rate !== 0);
 let startNode = nodes.find((n) => n.name === 'AA');
 
@@ -82,38 +80,40 @@ const totalRate = (valves) => {
   return valves.reduce((sum, curr) => sum + curr.rate, 0);
 };
 
-function dfs(curr, time, total, open, next) {
+function dfs(curr, time, total, open, next, elephant = false) {
   let max = total + totalRate(open) * time;
 
   // elephant valve logic
-  // check unopened
-  // elephant max = dfs(start, 0, 0, [], unopened)
-  // assign max
+  if (!elephant) {
+    const closed = next.filter(
+      (valve) => !open.find((o) => o.name === valve.name)
+    );
+    const elephantMax = dfs(startNode, 26, 0, [], closed, true);
+
+    max = total + elephantMax + totalRate(open) * time;
+  }
 
   for (const n of next) {
     // skip open valves
-    // console.log(!!open.find((o) => o.name === n.name));
     if (open.find((o) => o.name === n.name)) continue; // why did I think returns would work here??
 
     // skip if unreachable in remaining time
     const dist = distMap[curr.name][n.name] + 1;
-    // console.log(time + dist >= totalTime, time, time + dist, totalTime);
     if (time - dist < 0) continue;
 
     // move to valve and open
     const newTotal = total + dist * totalRate(open);
     open.push(n);
-    const value = dfs(n, time - dist, newTotal, open, next);
+    const value = dfs(n, time - dist, newTotal, open, next, elephant);
 
     max = Math.max(value, max);
     const nextIndex = open.findIndex((o) => o.name === n.name);
     open.splice(nextIndex, 1);
   }
 
-  // console.log(max);
   return max;
 }
 
-const out = dfs(startNode, 30, 0, [], flowValves);
+const out = dfs(startNode, 26, 0, [], flowValves);
 
 console.log('end', out);

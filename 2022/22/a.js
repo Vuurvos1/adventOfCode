@@ -3,76 +3,82 @@ import fs from 'node:fs';
 const rawInput = fs.readFileSync('input.txt', 'utf8');
 let [board, inputMoves] = rawInput.trimEnd().split('\n\n');
 
-board = board.split('\n');
-let moves = inputMoves.replaceAll('L', ' L ').replaceAll('R', ' R ').split(' ');
+board = board.split('\n').map((row) => row.split(''));
+const moves = inputMoves
+  .replaceAll('L', ' L ')
+  .replaceAll('R', ' R ')
+  .split(' ');
 
-console.log(moves, board);
+// console.log(moves, board);
 
 const dirs = {
-  0: [1, 0], // right
-  1: [0, -1], // down
-  2: [-1, 0], // left
-  3: [0, 1], // up
+  0: [1, 0], // right / east
+  1: [0, 1], // down / south
+  2: [-1, 0], // left / west
+  3: [0, -1], // up / north
 };
 
-let pos = { x: 0, y: 0 };
-pos.x = board[0].indexOf('.');
-
+let pos = { x: board[0].findIndex((c) => c !== ' '), y: 0 };
 console.log(pos);
 
 let dir = 0;
-for (let move of moves) {
+for (const move of moves) {
   if (move == 'L') {
-    dir--;
+    dir = (dir - 1 + 4) % 4;
     continue;
   }
 
   if (move == 'R') {
-    dir++;
+    dir = (dir + 1 + 4) % 4;
     continue;
   }
 
-  move = Number(move);
+  const [dx, dy] = dirs[dir];
 
-  const [dx, dy] = dirs[Math.abs(dir % 4)];
+  for (let i = 0; i < Number(move); i++) {
+    let newPos = { x: pos.x + dx, y: pos.y + dy };
 
-  for (let i = 0; i < move; i++) {
-    let prevPos = { ...pos };
-    pos.x += dx;
-    pos.y += dy;
-
-    // console.log(pos, prevPos);
-
-    // wrapping
-    if (board?.[pos.y]?.[pos.x] || board?.[pos.y]?.[pos.x] === ' ') {
-      // also includes collision
-
-      if (dx === 1) {
-        pos.x = board[0].indexOf('.');
-
-        // if ()
-        // if colliding return
-      } else if (dx === -1) {
-        // search y
-      } else if (dy === 1) {
-      } else if (dy === -1) {
+    // loop to next valid spot
+    while (true) {
+      // position wrapping
+      if (Math.abs(dy) > 0) {
+        if (newPos.y > board.length - 1) newPos.y = 0;
+        if (newPos.y < 0) newPos.y = board.length - 1;
       }
 
-      continue;
+      if (Math.abs(dx) > 0) {
+        if (newPos.x > board[newPos.y].length - 1) newPos.x = 0;
+        if (newPos.x < 0) newPos.x = board[newPos.y].length - 1;
+      }
+
+      // on a '.'
+      if (board[newPos.y][newPos.x] && board[newPos.y][newPos.x] !== ' ') {
+        break;
+      }
+
+      newPos.x += dx;
+      newPos.y += dy;
     }
 
-    // basic collision
-    if (board[pos.y][pos.x] === '#') {
-      pos = prevPos;
+    if (board[newPos.y][newPos.x] === '#') {
       break;
     }
 
-    // if (false) {
-
-    // }
+    pos = newPos;
   }
+
+  // let tmp = board.map((row) => [...row]);
+  // tmp[pos.y][pos.x] = dir;
+  // console.log(tmp.map((row) => row.join('')));
 }
 
-let out = 1000 * pos.x + 4 * pos.y + dir;
+console.log(pos, dir);
 
-console.log('end');
+let out = 1000 * (pos.y + 1) + 4 * (pos.x + 1) + dir;
+
+// 126280 HIGH
+// 126252 HIGH
+// 141136 HIGH
+// 103224
+
+console.log('end', out);

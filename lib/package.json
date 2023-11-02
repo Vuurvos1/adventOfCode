@@ -1,0 +1,11 @@
+{
+  "name": "lib",
+  "version": "0.0.1",
+  "description": "Set of util functions",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "type": "module",
+  "devDependencies": {}
+}

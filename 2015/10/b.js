@@ -1,6 +1,6 @@
 let input = '3113322113';
 
-for (let i = 0; i < 40; i++) {
+for (let i = 0; i < 50; i++) {
   const chars = input.split('');
   let output = '';
   let count = 1;

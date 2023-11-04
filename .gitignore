@@ -1,4 +1,5 @@
 node_modules/
+input.json
 input.txt
 tmp.txt
 tmp.js

@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import * as lib from 'lib';
 
 const input = fs
   .readFileSync('./2015/19/input.txt', 'utf8')
@@ -11,30 +10,35 @@ const inputReplacements = input[0].split('\n');
 const replacements = {};
 for (const input of inputReplacements) {
   const split = input.split(' => ');
-  if (!replacements[split[0]]) {
-    replacements[split[0]] = [split[1]];
-  } else {
-    replacements[split[0]].push(split[1]);
+  replacements[split[1]] = split[0];
+}
+
+// console.log(Object.keys(replacements).length, inputReplacements.length);
+
+let molecule = input[1];
+
+// const combinations = new Set();
+// const chunks = molecule.split(/(?=[A-Z])/);
+
+const repl = Object.entries(replacements).sort(
+  (a, b) => b[0].length - a[0].length
+);
+
+// console.log(repl);
+
+// TODO: search for shortest molecule
+for (let i = 0; i < 100_000; i++) {
+  if (molecule === 'e') {
+    console.log(i);
+    break;
+  }
+
+  for (const [key, value] of repl) {
+    if (molecule.includes(key)) {
+      // console.log(molecule, key, value);
+      molecule = molecule.replace(key, value);
+    }
   }
 }
 
-const molecule = input[1];
-
-const combinations = new Set();
-
-const chunks = molecule.split(/(?=[A-Z])/);
-
-// TODO: search for shortest molecule
-// for (let i = 0; i < chunks.length; i++) {
-//   const chunk = chunks[i];
-
-//   if (!replacements[chunk]) continue;
-
-//   const copy = [...chunks];
-//   for (const atom of replacements[chunk]) {
-//     copy[i] = atom;
-//     combinations.add(copy.join(''));
-//   }
-// }
-
-console.log(combinations.size);
+// 19 not it?

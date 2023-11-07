@@ -17,7 +17,6 @@ const reindeer = input.map((deer) => {
   };
 });
 
-// TODO: speed up using some math magic
 for (let i = 0; i < 2503; i++) {
   for (const deer of reindeer) {
     if (deer.cooldown > deer.rest) {

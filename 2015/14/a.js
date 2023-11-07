@@ -11,27 +11,16 @@ const reindeer = input.map((deer) => {
     speed: values[0],
     duration: values[1],
     rest: values[2],
-    cooldown: values[1] + values[2],
     distance: 0,
-    score: 0,
   };
 });
 
-for (let i = 0; i < 2503; i++) {
-  for (const deer of reindeer) {
-    if (deer.cooldown > deer.rest) {
-      deer.distance += deer.speed;
-      deer.cooldown--;
-      continue;
-    }
-
-    deer.cooldown--;
-
-    if (deer.cooldown <= 0) {
-      deer.cooldown = deer.rest + deer.duration;
-    }
-  }
+const time = 2503;
+for (const deer of reindeer) {
+  var cooldown = deer.duration + deer.rest;
+  var distance = Math.floor(time / cooldown) * deer.speed * deer.duration;
+  var remaining = time % cooldown;
+  deer.distance = distance + Math.min(remaining, deer.duration) * deer.speed;
 }
 
-// 2640 low
-console.log(reindeer, reindeer.sort((a, b) => b.distance - a.distance)[0]);
+console.log(reindeer.sort((a, b) => b.distance - a.distance)[0]);

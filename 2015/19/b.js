@@ -13,23 +13,18 @@ for (const input of inputReplacements) {
   replacements[split[1]] = split[0];
 }
 
-// console.log(Object.keys(replacements).length, inputReplacements.length);
-
 let molecule = input[1];
-
-// const combinations = new Set();
-// const chunks = molecule.split(/(?=[A-Z])/);
 
 const repl = Object.entries(replacements).sort(
   (a, b) => b[0].length - a[0].length
 );
 
-// console.log(repl);
-
-// TODO: search for shortest molecule
-for (let i = 0; i < 100_000; i++) {
+console.time('e');
+let repls = 0;
+// big number in case it breaks
+for (let i = 0; i < 1_000_000; i++) {
   if (molecule === 'e') {
-    console.log(i);
+    console.log(i, repls, molecule);
     break;
   }
 
@@ -37,8 +32,11 @@ for (let i = 0; i < 100_000; i++) {
     if (molecule.includes(key)) {
       // console.log(molecule, key, value);
       molecule = molecule.replace(key, value);
+      repls++;
+      continue;
     }
   }
 }
+console.timeEnd('e');
 
-// 19 not it?
+console.log(molecule);

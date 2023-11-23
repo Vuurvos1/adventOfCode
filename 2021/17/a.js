@@ -1,10 +1,15 @@
-async function main() {
+function main() {
     let max = 0;
+
+    const bounds = { x1: 144, y1: -76, x2: 178, y2: -100 };
+    // const bounds = {x1: 20, y1: -5 ,  x2: 30 , y2: -10}
 
     const point = { x: 0, y: 0 };
     const velocity = { x: 0, y: 0 };
-    for (let y = -1000; y < 1000; y++) {
-        for (let x = 0; x < 1000; x++) {
+    for (let y = 0; y < -bounds.y2; y++) {
+        // only simulate minimum required x steps before overshooting
+        const tmp = Math.abs(bounds.x2 / y === 0 ? 1 : y);
+        for (let x = 0; x < tmp; x++) {
             velocity.x = x;
             velocity.y = y;
 
@@ -13,21 +18,16 @@ async function main() {
 
             // steps
             let tmpMax = 0;
-            for (let i = 0; i < 1000; i++) {
+            while (true) {
                 point.x += velocity.x;
                 point.y += velocity.y;
 
                 // update velocities
-                if (velocity.x > 1) {
+                if (velocity.x > 0) {
                     velocity.x--;
                 } else if (velocity.x < 0) {
                     velocity.x++;
                 }
-
-                velocity.x = Math.max(
-                    velocity.x > 0 ? velocity.x - 1 : velocity.x + 1,
-                    0
-                );
 
                 velocity.y -= 1;
 
@@ -39,7 +39,7 @@ async function main() {
                 }
 
                 // get max y
-                if (point.y > max && point.y > tmpMax) {
+                if (point.y > tmpMax) {
                     // console.log(point.x, point.y, tmpMax);
                     tmpMax = point.y;
                 }
@@ -58,7 +58,7 @@ async function main() {
 }
 
 // 4950
-console.log(await main());
+console.log("output", main());
 
 function coll(x, y) {
     // input: target area: x=144..178, y=-100..-76

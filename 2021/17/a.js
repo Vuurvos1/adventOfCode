@@ -1,8 +1,6 @@
 async function main() {
     let max = 0;
 
-    const hits = [];
-
     const point = { x: 0, y: 0 };
     const velocity = { x: 0, y: 0 };
     for (let y = -1000; y < 1000; y++) {
@@ -14,36 +12,52 @@ async function main() {
             point.y = 0;
 
             // steps
+            let tmpMax = 0;
             for (let i = 0; i < 1000; i++) {
                 point.x += velocity.x;
                 point.y += velocity.y;
 
-                if (velocity.x > 0) {
+                // update velocities
+                if (velocity.x > 1) {
                     velocity.x--;
                 } else if (velocity.x < 0) {
                     velocity.x++;
                 }
 
+                velocity.x = Math.max(
+                    velocity.x > 0 ? velocity.x - 1 : velocity.x + 1,
+                    0
+                );
+
                 velocity.y -= 1;
 
                 // passed area
-                if (point.x > 178 || point.y < -100) {
+                // if (point.x > 30 || point.y < -10) {
+                if (point.x > 278 || point.y < -100) {
+                    // console.log("passed");
                     break;
                 }
 
-                if (coll(point.x, point.y)) {
-                    max++;
-                    hits.push([x, y]);
+                // get max y
+                if (point.y > max && point.y > tmpMax) {
+                    // console.log(point.x, point.y, tmpMax);
+                    tmpMax = point.y;
+                }
+
+                // update max if collided and creater
+                if (tmpMax >= max && coll(point.x, point.y)) {
+                    max = tmpMax;
+                    // console.log("hit!", max);
                     break;
                 }
             }
         }
     }
 
-    console.table(hits);
     return max;
 }
 
+// 4950
 console.log(await main());
 
 function coll(x, y) {

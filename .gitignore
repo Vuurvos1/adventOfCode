@@ -3,3 +3,6 @@ input.json
 input.txt
 tmp.txt
 tmp.js
+
+.env
+!.env.example

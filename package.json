@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon index.js",
-        "generate": "nodemon scripts/setup.js",
+        "generate": "scripts/setup.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "nodemon": "nodemon"
     },

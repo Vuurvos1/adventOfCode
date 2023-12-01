@@ -41,7 +41,7 @@ let output = 0;
 
 
 console.info(output)
-clipboard.writeSync(output);
+clipboard.writeSync(String(output));
 `;
 
 if (!fileExists(fileBasePath + "/a.js")) {

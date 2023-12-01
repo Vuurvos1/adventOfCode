@@ -2,11 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import "dotenv/config";
 
-// const rawInput = fs.readFileSync('input.txt', 'utf8');
-// const input = rawInput.trimEnd().split('\n');
-
-// console.log('end', 0);
-
 const date = new Date();
 
 /** @type {Record<string, string>} */
@@ -21,12 +16,9 @@ process.argv.forEach((arg) => {
 const day = Number(args?.day) || date.getDate();
 const year = Number(args?.year) || date.getFullYear();
 
-console.log(day, year);
-
+// TODO: check for propper date range
 if (day > 25 || year > new Date().getFullYear())
     throw new Error("Date out of range");
-
-// TODO: check for propper date range
 
 const fileBasePath = `./${year}/${day}`;
 
@@ -34,7 +26,7 @@ const baseTemplate = `import fs from 'node:fs';
 import * as lib from 'lib';
 import clipboard from 'clipboardy';
 
-const input = fs.readFileSync('input.txt', 'utf8').trim().split('\\n');
+const input = fs.readFileSync('./${year}/${day}/input.txt', 'utf8').trim().split('\\n');
 
 let output = 0;
 

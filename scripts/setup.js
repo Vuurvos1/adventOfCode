@@ -20,7 +20,7 @@ const year = Number(args?.year) || date.getFullYear();
 if (day > 25 || year > new Date().getFullYear())
     throw new Error("Date out of range");
 
-const fileBasePath = `./${year}/${day}`;
+const fileBasePath = `./${year}/${String(day).padStart(2, "0")}`;
 
 const baseTemplate = `import fs from 'node:fs';
 import * as lib from 'lib';

@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon index.js",
-        "generate": "scripts/setup.js",
+        "generate": "node scripts/setup.js",
         "nodemon": "nodemon"
     },
     "keywords": [],

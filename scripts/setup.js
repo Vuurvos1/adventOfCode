@@ -26,7 +26,7 @@ const baseTemplate = `import fs from 'node:fs';
 import * as lib from 'lib';
 import clipboard from 'clipboardy';
 
-const input = fs.readFileSync('./${year}/${day}/input.txt', 'utf8').trim().split('\\n');
+const input = fs.readFileSync('${fileBasePath}/input.txt', 'utf8').trim().split('\\n');
 
 let output = 0;
 

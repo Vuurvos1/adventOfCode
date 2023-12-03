@@ -2,7 +2,7 @@ import fs from "node:fs";
 import * as lib from "lib";
 import clipboard from "clipboardy";
 
-const input = fs.readFileSync("./2023/2/input.txt", "utf8").trim().split("\n");
+const input = fs.readFileSync("./2023/02/input.txt", "utf8").trim().split("\n");
 
 let output = 0;
 
@@ -22,8 +22,7 @@ for (let i = 0; i < input.length; i++) {
         const grabs = res.split(", ");
 
         for (let j = 0; j < grabs.length; j++) {
-            const grab = grabs[j];
-            let [amount, color] = grab.split(" ");
+            let [amount, color] = grabs[j].split(" ");
             amount = Number(amount);
 
             cubes[color] = Math.max(cubes[color], amount);

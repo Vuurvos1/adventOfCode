@@ -6,8 +6,7 @@ const input = fs.readFileSync("./2023/04/input.txt", "utf8").trim().split("\n");
 
 let output = 0;
 
-const winningCards = new Map();
-const cards = new Int32Array(1000);
+const cards = new Int32Array(input.length).fill(1);
 
 for (const line of input) {
     const [cardName, nums] = line.split(": ");
@@ -16,30 +15,16 @@ for (const line of input) {
 
     const winningNumbers = new Set([...w]);
 
-    console.log("card", cardIndex);
-    let score = cardIndex;
+    let i = 0;
     for (const num of n) {
         if (winningNumbers.has(num)) {
-            console.info(
-                cardIndex,
-                num,
-                score,
-                cards.slice(0, 10),
-                cards[cardIndex]
-            );
-
-            const c = cardIndex + score;
-            cards[c] = cards[c] + 1 * (cards[cardIndex] || 1);
-
-            score++;
+            const offset = cardIndex + i;
+            if (!!cards[offset]) cards[offset] += cards[cardIndex - 1];
+            i++;
         }
     }
 }
 
-output = [...winningCards.values()].reduce((acc, curr) => acc + curr, 0);
-console.info(
-    output,
-    cards.reduce((acc, curr) => acc + curr, 0),
-    cards.slice(0, 10)
-);
+output = cards.reduce((acc, curr) => acc + curr, 0);
+console.info(output);
 clipboard.writeSync(String(output));

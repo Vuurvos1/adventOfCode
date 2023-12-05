@@ -1,6 +1,8 @@
 node_modules/
 input.json
 input.txt
+output.json
+output.txt
 tmp.txt
 tmp.js
 

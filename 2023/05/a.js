@@ -10,19 +10,53 @@ const input = fs
 const [seedInput, ...mapsInput] = input;
 
 const seeds = lib.parseNumbers(seedInput);
+/** @type {Record<string, {name: string, from: string, to: string, ranges: number[][]}> } */
 const maps = {};
 
 for (const map of mapsInput) {
     let [name, ...rest] = map.split("\n");
     name = name.split(" ")[0];
+    const [from, _, to] = name.split("-");
 
-    maps[name] = {}; //
-    maps[name].ranges = rest.map((row) => lib.parseNumbers(row));
+    maps[from] = {
+        name,
+        from,
+        to,
+    };
+    maps[from].ranges = rest.map((row) => lib.parseNumbers(row));
 }
 
-console.info(seeds, maps);
+/** @type {number[]} */
+let output = [];
 
-let output = 0;
+for (const seed of seeds) {
+    let next = "seed";
+    let source = seed;
 
-console.info(output);
-clipboard.writeSync(String(output));
+    while (true) {
+        const map = maps[next];
+        if (!map) {
+            output.push(source);
+            break;
+        }
+
+        const match = map.ranges.find((el) => {
+            const [_destination, src, length] = el;
+            if (source >= src && source < src + length) return true;
+        });
+
+        // if not found keep same source number
+
+        if (match) {
+            const [destination, src, length] = match;
+            const offset = source - src;
+            source = destination + offset;
+        }
+
+        next = map.to;
+    }
+}
+
+const min = Math.min(...output);
+console.info(min);
+clipboard.writeSync(String(min));

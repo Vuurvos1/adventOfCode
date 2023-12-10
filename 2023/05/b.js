@@ -2,6 +2,7 @@ import fs from "node:fs";
 import * as lib from "lib";
 import clipboard from "clipboardy";
 
+/** @typedef {{ name: string, range: number[], children: Item[]}} Item */
 const input = fs
     .readFileSync("./2023/05/input.txt", "utf8")
     .trim()

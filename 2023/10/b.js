@@ -9,12 +9,30 @@ const map = fs
     .map((line) => line.split(""));
 
 const pipeMap = {
-    "|": ["N", "S"],
-    "-": ["E", "W"],
-    L: ["N", "E"],
-    J: ["N", "W"],
-    7: ["S", "W"],
-    F: ["S", "E"],
+    "|": [
+        { x: 0, y: -1 },
+        { x: 0, y: 1 },
+    ],
+    "-": [
+        { x: 1, y: 0 },
+        { x: -1, y: 0 },
+    ],
+    L: [
+        { x: 0, y: -1 },
+        { x: 1, y: 0 },
+    ],
+    J: [
+        { x: 0, y: -1 },
+        { x: -1, y: 0 },
+    ],
+    7: [
+        { x: 0, y: 1 },
+        { x: -1, y: 0 },
+    ],
+    F: [
+        { x: 0, y: 1 },
+        { x: 1, y: 0 },
+    ],
 };
 
 const boxMap = {
@@ -24,61 +42,40 @@ const boxMap = {
     J: "┘",
     7: "┐",
     F: "┌",
+    S: "█",
 };
 
-const directionMap = {
-    N: { x: 0, y: -1 },
-    S: { x: 0, y: 1 },
-    E: { x: 1, y: 0 },
-    W: { x: -1, y: 0 },
-};
-
-const startPos = { x: -1, y: -1 };
-for (let y = 0; y < map.length; y++) {
-    for (let x = 0; x < map[y].length; x++) {
-        const char = map[y][x];
-        if (char === "S") {
-            startPos.x = x;
-            startPos.y = y;
-            console.log("start", x, y);
-            break;
-        }
-    }
-
-    if (startPos.x !== -1) {
-        break;
-    }
-}
+const grid = new lib.Grid(map);
+const startPos = grid.findIndex((value) => value === "S");
 
 console.log(startPos);
 
 const visited = new Set();
+/** @type {{x: number, y: number}[]} */
+const mapStack = [{ ...startPos }];
 
-const pos = { ...startPos };
-for (let i = 0; i < 1000000; i++) {
+console.time("loop");
+while (mapStack.length > 0) {
+    const pos = mapStack.pop();
+
+    if (visited.has(`${pos.x},${pos.y}`)) {
+        continue;
+    }
+
+    if (!lib.isInbounds(pos.x, pos.y, map)) {
+        continue;
+    }
+
     visited.add(`${pos.x},${pos.y}`);
 
     const connected = getConnected(pos.x, pos.y);
-
     for (const c of connected) {
-        if (visited.has(`${c.x},${c.y}`)) {
-            continue;
-        }
-
-        pos.x = c.x;
-        pos.y = c.y;
-    }
-
-    // this doesn't work
-    if (map[pos.y][pos.x] === "S") {
-        console.log("start", i, pos.x, pos.y);
-        break;
+        mapStack.push(c);
     }
 }
+console.timeEnd("loop");
 
 const mapCopy = [...map];
-
-// console.log(visited);
 
 for (let y = 0; y < mapCopy.length; y++) {
     for (let x = 0; x < mapCopy[y].length; x++) {
@@ -103,7 +100,7 @@ const stack = [floodStart];
 while (stack.length > 0) {
     const pos = stack.pop();
 
-    if (!inbounds(pos.x, pos.y, mapCopy)) {
+    if (!lib.isInbounds(pos.x, pos.y, mapCopy)) {
         continue;
     }
 
@@ -112,14 +109,12 @@ while (stack.length > 0) {
     }
 
     if (mapCopy[pos.y][pos.x] === ".") {
-        // mapCopy[pos.y][pos.x] = "F";
-
         mapCopy[pos.y][pos.x] = " ";
 
-        for (const direction of ["N", "S", "E", "W"]) {
+        for (const direction of lib.cardinalDirections) {
             const searchPos = {
-                x: pos.x + directionMap[direction].x,
-                y: pos.y + directionMap[direction].y,
+                x: pos.x + direction.x,
+                y: pos.y + direction.y,
             };
 
             stack.push(searchPos);
@@ -133,9 +128,6 @@ for (let y = 0; y < mapCopy.length; y++) {
         if (boxMap[char]) {
             mapCopy[y][x] = boxMap[char];
         }
-        // if (mapCopy[y][x] === " ") {
-        //     mapCopy[y][x] = ".";
-        // }
     }
 }
 
@@ -145,7 +137,6 @@ fs.writeFileSync(
 );
 
 // count remaining dots (.)
-
 const output = mapCopy.reduce((acc, row) => {
     return acc + row.filter((c) => c === ".").length;
 }, 0);
@@ -153,14 +144,7 @@ const output = mapCopy.reduce((acc, row) => {
 // 614 high
 
 console.info(output);
-clipboard.writeSync(String(output));
-
-function inbounds(x, y, map) {
-    if (x === -1 || y === -1 || x === map[0].length || y === map.length) {
-        return false;
-    }
-    return true;
-}
+// clipboard.writeSync(String(output));
 
 function getConnected(x, y) {
     if (x === -1 || y === -1 || x === map[0].length || y === map.length) {
@@ -198,15 +182,8 @@ function getConnected(x, y) {
         return [];
     }
 
-    const directions = pipeMap[char];
-    const connected = [];
-
-    for (const direction of directions) {
-        connected.push({
-            x: x + directionMap[direction].x,
-            y: y + directionMap[direction].y,
-        });
-    }
-
-    return connected;
+    return pipeMap[char].map((direction) => ({
+        x: x + direction.x,
+        y: y + direction.y,
+    }));
 }

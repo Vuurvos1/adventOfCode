@@ -10,7 +10,7 @@ const input = fs
 
 const expansionAmount = 1_000_000;
 
-// expand vertically
+// verticall expansion
 const horizontal = [];
 for (let y = 0; y < input.length; y++) {
     const line = input[y];
@@ -19,13 +19,14 @@ for (let y = 0; y < input.length; y++) {
     }
 }
 
-// expand horizontally
+// horizontal expansion
 const vertical = [];
 for (let x = 0; x < input[0].length; x++) {
     let match = false;
     for (let y = 0; y < input.length; y++) {
         if (input[y][x] === "#") {
             match = true;
+            break;
         }
     }
 
@@ -71,10 +72,8 @@ for (let i = 0; i < galaxies.length; i++) {
             }
         }
 
-        // const distance = lib.manhattanDistance(galaxyA, galaxyB);
         const distance =
-            Math.abs(galaxyA.x - galaxyB.x) +
-            Math.abs(galaxyA.y - galaxyB.y) +
+            lib.manhattanDistance(galaxyA, galaxyB) +
             intersections * expansionAmount -
             intersections;
 

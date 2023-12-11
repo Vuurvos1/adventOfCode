@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import * as lib from "lib";
 import clipboard from "clipboardy";
-import exp from "node:constants";
 
 const input = fs
     .readFileSync("./2023/11/input.txt", "utf8")
@@ -16,7 +15,7 @@ for (const line of input) {
     if (line.every((char) => char === ".")) {
         expanded.push(line);
     }
-    expanded.push(line);
+    expanded.push([...line]);
 }
 
 // expand horizontally
@@ -30,13 +29,10 @@ for (let x = 0; x < expanded[0].length; x++) {
 
     if (match) continue;
 
-    // TODO: borked
-    console.log("inserting", x);
-    // // const length = expanded[x].length;
-    for (let y = 0; y < expanded[y].length; y++) {
+    for (let y = 0; y < expanded.length; y++) {
         expanded[y].splice(x, 0, ".");
     }
-    x++; // to account for the inserted column
+    x++;
 }
 
 fs.writeFileSync(

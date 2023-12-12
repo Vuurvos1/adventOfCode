@@ -35,11 +35,6 @@ for (let x = 0; x < expanded[0].length; x++) {
     x++;
 }
 
-fs.writeFileSync(
-    "./2023/11/output.txt",
-    expanded.map((l) => l.join("")).join("\n")
-);
-
 // get galaxies
 const galaxies = [];
 for (let y = 0; y < expanded.length; y++) {
@@ -57,10 +52,7 @@ for (let i = 0; i < galaxies.length; i++) {
         const galaxyA = galaxies[i];
         const galaxyB = galaxies[j];
 
-        // const distance = lib.manhattanDistance(galaxyA, galaxyB);
-        const distance =
-            Math.abs(galaxyA.x - galaxyB.x) + Math.abs(galaxyA.y - galaxyB.y);
-
+        const distance = lib.manhattanDistance(galaxyA, galaxyB);
         distances.push(distance);
     }
 }

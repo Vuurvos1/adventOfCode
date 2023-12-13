@@ -13,22 +13,16 @@ const boards = fs
  * @param {number} row
  */
 function checkHorizontal(pattern, row) {
-    for (let i = row - 1, j = row; i >= 0 && j < pattern.length; i--, j++) {
+    let j = row;
+    for (let i = row - 1; i >= 0 && j < pattern.length; i--) {
         if (pattern[i] !== pattern[j]) return false;
+        j++;
     }
     return true;
 }
 
 function transpose(pattern) {
-    // const newPattern = [];
-    // for (let y = 0; y < pattern.length; y++) {
-    //     for (let x = 0; x < pattern[y].length; x++) {
-    //         if (!newPattern[x]) newPattern[x] = [];
-    //         newPattern[x][y] = pattern[y][x];
-    //     }
-    // }
-
-    const result = Array(pattern[0].length).fill("");
+    const result = Array(pattern[0].length);
     for (const row of pattern) {
         [...row].forEach((c, i) => (result[i] += c));
     }

@@ -8,104 +8,55 @@ const boards = fs
     .split("\n\n")
     .map((board) => board.split("\n"));
 
-/**
- * @param {string[]} pattern
- * @param {number} row
- */
-function checkHorizontal(pattern, row) {
-    let j = row;
-    for (let i = row - 1; i >= 0 && j < pattern.length; i--) {
-        if (pattern[i] !== pattern[j]) return false;
-        j++;
-    }
-    return true;
-}
+let output = 0;
 
-function getBoardScore(board, skipValue) {
-    // find horizontal reflection
-    for (let y = 1; y < board.length; y++) {
-        const match = checkHorizontal(board, y);
-
-        if (match) {
-            const score = 100 * y;
-
-            console.log(skipValue, score);
-            if (skipValue === score) continue;
-
-            return score;
-            // if (skipValue) {
-            //     if (score !== skipValue) return score;
-            // } else {
-            // }
-        }
-    }
-
-    // find vertical reflection, transpose board to reuse horizontal check
-    const newBoard = transpose(board);
-    for (let x = 1; x < newBoard.length; x++) {
-        const match = checkHorizontal(newBoard, x);
-
-        if (match) {
-            const score = x;
-            console.log(skipValue, score);
-            if (skipValue === score) continue;
-            return score;
-            // if (skipValue) {
-            //     if (score !== skipValue) return score;
-            // } else {
-            // }
-        }
-    }
-
-    // console.log("out");
-
-    return 0;
-}
-
-function replaceAt(str, index, char) {
-    if (index > str.length - 1) return str;
-    return str.substring(0, index) + char + str.substring(index + 1);
-}
-
-function transpose(pattern) {
-    const result = Array(pattern[0].length);
-    for (const row of pattern) {
+function transpose(board) {
+    const result = Array(board[0].length).fill("");
+    for (const row of board) {
         [...row].forEach((c, i) => (result[i] += c));
     }
     return result;
 }
 
-let output = 0;
-
-for (const board of boards) {
-    let score = getBoardScore(board);
-
-    console.log("board", board.join("\n"), score);
-
-    for (let y = 0; y < board.length; y++) {
-        let br = false;
-        for (let x = 0; x < board[y].length; x++) {
-            board[y] = replaceAt(board[y], x, board[y][x] === "#" ? "." : "#");
-
-            // check logic
-            const newScore = getBoardScore(board, score);
-            if (newScore === 0) continue;
-            output += newScore;
-            if (newScore !== score) {
-                console.log(board.join("\n"), score, newScore);
-                br = true;
-                break;
-            }
-
-            board[y] = replaceAt(board[y], x, board[y][x] === "#" ? "." : "#");
+function getBoardScore(board) {
+    for (let y = 1; y < board.length; y++) {
+        const match = checkHorizontal(board, y);
+        if (match) {
+            return 100 * y;
         }
-        if (br) break;
     }
 
-    // if (!updated) output += score;
+    // find vertical reflection, transpose board to reuse horizontal check
+    const transposed = transpose(board);
+    for (let x = 1; x < transposed.length; x++) {
+        const match = checkHorizontal(transposed, x);
+        if (match) {
+            return x;
+        }
+    }
 }
 
-// 6339 low
-// 28967 low
+/**
+ * @param {string[]} pattern
+ * @param {number} row
+ */
+function checkHorizontal(pattern, row) {
+    let match = false;
+    for (let i = row - 1, j = row; i >= 0 && j < pattern.length; i--, j++) {
+        for (let k = 0; k < pattern[i].length; k++) {
+            // allow for 1 mismatch (dirty spot)
+            if (pattern[i][k] !== pattern[j][k]) {
+                if (match) return false;
+                match = true;
+            }
+        }
+    }
+    if (match) return true;
+}
+
+for (const board of boards) {
+    output += getBoardScore(board);
+}
+
 console.info(output);
-clipboard.writeSync(String(output));
+// clipboard.writeSync(String(output));

@@ -29,28 +29,27 @@ function transpose(pattern) {
     return result;
 }
 
-let output = 0;
-
-for (const board of boards) {
+function getBoardScore(board) {
     // find horizontal reflection
     for (let y = 1; y < board.length; y++) {
         const match = checkHorizontal(board, y);
 
-        if (match) {
-            output += 100 * y;
-            break;
-        }
+        if (match) return 100 * y;
     }
 
     // find vertical reflection, transpose board to reuse horizontal check
     const newBoard = transpose(board);
     for (let x = 1; x < newBoard.length; x++) {
         const match = checkHorizontal(newBoard, x);
-        if (match) {
-            output += x;
-            break;
-        }
+
+        if (match) return x;
     }
+}
+
+let output = 0;
+
+for (const board of boards) {
+    output += getBoardScore(board);
 }
 
 console.info(output);

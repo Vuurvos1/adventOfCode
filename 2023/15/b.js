@@ -5,8 +5,9 @@ import clipboard from "clipboardy";
 const input = fs.readFileSync("./2023/15/input.txt", "utf8").trim().split(",");
 
 /** @type {string[][]} */
-const boxes = Array(256).fill([]);
-console.log(boxes.length);
+const boxes = Array(256)
+    .fill(0)
+    .map((el) => []);
 
 function hashString(str) {
     let value = 0;
@@ -23,16 +24,24 @@ function hashString(str) {
     return value;
 }
 
+function logBoxes(boxes) {
+    for (let i = 0; i < boxes.length; i++) {
+        const box = boxes[i];
+
+        if (box.length > 0) {
+            console.log(i, box);
+        }
+    }
+}
+
 for (const str of input) {
     if (str.includes("-")) {
         const [label, focal] = str.split("-");
         const hash = hashString(label);
 
-        // boxes[hash].find((box) => box[0] !== label);
         const index = boxes[hash].findIndex((box) => box[0] === label);
 
         if (index > -1) {
-            console.log("slicing", label, focal);
             boxes[hash].splice(index, 1);
         }
         continue;
@@ -41,24 +50,25 @@ for (const str of input) {
     if (str.includes("=")) {
         const [label, focal] = str.split("=");
         const hash = hashString(label);
-        // console.log(hash);
 
         // if already in box
-        if (boxes[hash].find((box) => box[0] === label)) {
+        const index = boxes[hash].findIndex((box) => box[0] === label);
+        if (index >= 0) {
             // replace
+            boxes[hash][index][1] = focal;
+        } else {
             boxes[hash].push([label, focal]);
-            continue;
         }
-
-        boxes[hash].push([label, focal]);
     }
 }
-// console.log(boxes);
+// logBoxes(boxes);
 
 let output = 0;
 for (let i = 0; i < boxes.length; i++) {
     for (let j = 0; j < boxes[i].length; j++) {
-        output += i + 1 * j + 1 * Number(boxes[i][j][1]);
+        const n = Number(boxes[i][j][1]);
+        const s = (i + 1) * (j + 1) * n;
+        output += s;
     }
 }
 

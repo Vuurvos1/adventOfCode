@@ -97,7 +97,9 @@ while (true) {
         input
             .map((line, y) =>
                 line
-                    .map((row, x) => (visited.has(`${x},${y}`) ? "#" : "."))
+                    .map((row, x) =>
+                        visited.has(`${x},${y}`) ? "#" : input[y][x]
+                    )
                     .join("")
             )
             .join("\n")

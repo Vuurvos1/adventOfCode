@@ -71,29 +71,21 @@ while (edges.length > 0) {
             // reflect
             if (input[head.y][head.x] === "/") {
                 if (head.vx === 0) {
-                    const vx = -head.vy;
-                    const vy = -head.vx;
-                    head.vx = vx;
-                    head.vy = vy;
+                    head.vx = -head.vy;
+                    head.vy = 0;
                 } else {
-                    const vx = -head.vy;
-                    const vy = -head.vx;
-                    head.vx = vx;
-                    head.vy = vy;
+                    head.vy = -head.vx;
+                    head.vx = 0;
                 }
             }
 
             if (input[head.y][head.x] === "\\") {
                 if (head.vx === 0) {
-                    const vx = head.vy;
-                    const vy = head.vx;
-                    head.vx = vx;
-                    head.vy = vy;
+                    head.vx = head.vy;
+                    head.vy = 0;
                 } else {
-                    const vx = head.vy;
-                    const vy = head.vx;
-                    head.vx = vx;
-                    head.vy = vy;
+                    head.vy = head.vx;
+                    head.vx = 0;
                 }
             }
 
@@ -103,16 +95,6 @@ while (edges.length > 0) {
             head.x += head.vx;
             head.y += head.vy;
         }
-
-        // console.log(
-        //     input
-        //         .map((line, y) =>
-        //             line
-        //                 .map((row, x) => (visited.has(`${x},${y}`) ? "#" : "."))
-        //                 .join("")
-        //         )
-        //         .join("\n")
-        // );
     }
 
     max = Math.max(max, visited.size);

@@ -11,6 +11,15 @@ const input = fs
 const visited = new Set();
 let heads = [{ x: 0, y: 0, vx: 1, vy: 0 }];
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function clearConsole() {
+    let lines = process.stdout.getWindowSize()[1];
+    for (let i = 0; i < lines; i++) {
+        console.log("\r\n");
+    }
+}
+
 while (true) {
     if (heads.length === 0) {
         break;
@@ -44,7 +53,6 @@ while (true) {
         }
 
         if (input[head.y][head.x] === "|") {
-            // console.log("split", head);
             if (head.vy === 0) {
                 heads = heads.filter((h) => h !== head);
 
@@ -58,29 +66,21 @@ while (true) {
         // reflect
         if (input[head.y][head.x] === "/") {
             if (head.vx === 0) {
-                const vx = -head.vy;
-                const vy = -head.vx;
-                head.vx = vx;
-                head.vy = vy;
+                head.vx = -head.vy;
+                head.vy = 0;
             } else {
-                const vx = -head.vy;
-                const vy = -head.vx;
-                head.vx = vx;
-                head.vy = vy;
+                head.vy = -head.vx;
+                head.vx = 0;
             }
         }
 
         if (input[head.y][head.x] === "\\") {
             if (head.vx === 0) {
-                const vx = head.vy;
-                const vy = head.vx;
-                head.vx = vx;
-                head.vy = vy;
+                head.vx = head.vy;
+                head.vy = 0;
             } else {
-                const vx = head.vy;
-                const vy = head.vx;
-                head.vx = vx;
-                head.vy = vy;
+                head.vy = head.vx;
+                head.vx = 0;
             }
         }
 
@@ -91,15 +91,19 @@ while (true) {
         head.y += head.vy;
     }
 
-    // console.log(
-    //     input
-    //         .map((line, y) =>
-    //             line
-    //                 .map((row, x) => (visited.has(`${x},${y}`) ? "#" : "."))
-    //                 .join("")
-    //         )
-    //         .join("\n")
-    // );
+    clearConsole();
+
+    console.log(
+        input
+            .map((line, y) =>
+                line
+                    .map((row, x) => (visited.has(`${x},${y}`) ? "#" : "."))
+                    .join("")
+            )
+            .join("\n")
+    );
+
+    await sleep(150);
 }
 
 const output = visited.size;

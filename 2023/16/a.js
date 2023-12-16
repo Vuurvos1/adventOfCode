@@ -13,13 +13,6 @@ let heads = [{ x: 0, y: 0, vx: 1, vy: 0 }];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function clearConsole() {
-    let lines = process.stdout.getWindowSize()[1];
-    for (let i = 0; i < lines; i++) {
-        console.log("\r\n");
-    }
-}
-
 while (true) {
     if (heads.length === 0) {
         break;
@@ -91,8 +84,7 @@ while (true) {
         head.y += head.vy;
     }
 
-    clearConsole();
-
+    console.clear();
     console.log(
         input
             .map((line, y) =>
@@ -104,8 +96,7 @@ while (true) {
             )
             .join("\n")
     );
-
-    await sleep(150);
+    await sleep(75);
 }
 
 const output = visited.size;

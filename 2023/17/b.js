@@ -46,14 +46,9 @@ while (queue.length > 0) {
 
     if (steps >= 4 || (dx === 0 && dy === 0)) {
         for (const dir of lib.cardinalDirections) {
-            // TODO: make this faster without JSON.stringify
             if (
-                !(
-                    JSON.stringify([dir.y, dir.x]) !==
-                        JSON.stringify([dy, dx]) &&
-                    JSON.stringify([dir.y, dir.x]) !==
-                        JSON.stringify([-dy, -dx])
-                )
+                (dir.y === dy && dir.x === dx) ||
+                (dir.y === -dy && dir.x === -dx)
             )
                 continue;
 

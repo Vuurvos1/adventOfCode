@@ -45,13 +45,7 @@ while (queue.length > 0) {
     }
 
     for (const dir of lib.cardinalDirections) {
-        // TODO: make this faster without JSON.stringify
-        if (
-            !(
-                JSON.stringify([dir.y, dir.x]) !== JSON.stringify([dy, dx]) &&
-                JSON.stringify([dir.y, dir.x]) !== JSON.stringify([-dy, -dx])
-            )
-        )
+        if ((dir.y === dy && dir.x === dx) || (dir.y === -dy && dir.x === -dx))
             continue;
 
         const newX = x + dir.x;

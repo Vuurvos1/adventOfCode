@@ -14,6 +14,7 @@ const dirs = {
     L: { x: -1, y: 0 },
 };
 
+console.time("t");
 // trench
 for (const line of input) {
     let [dir, amount, color] = line.split(" ");
@@ -45,9 +46,9 @@ while (queue.length > 0) {
         queue.push({ x: x + dir.x, y: y + dir.y, steps: steps + 1 });
     }
 }
+console.timeEnd("t");
 
 let output = points.size + visited.size;
 
-console.log(points.size, points.has("0,0"));
 console.info(output);
 clipboard.writeSync(String(output));

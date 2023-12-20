@@ -2,6 +2,10 @@ import fs from "node:fs";
 import * as lib from "lib";
 import clipboard from "clipboardy";
 
+/** @typedef {{gt: boolean, lt:boolean, compareVar: 'x'| 'm'|'a' | 's', value: number, target: string }} Instruction */
+
+/** @typedef {{ x: number, m: number, a: number, s: number}} Part */
+
 const [rawInstructions, rawParts] = fs
     .readFileSync("./2023/19/input.txt", "utf8")
     .trim()
@@ -22,51 +26,123 @@ const parts = rawParts
         )
     );
 
-console.log(parts);
-
 // workflows
+// TODO: a workflow should have instructions for better naming
+
+/** @type {Record<string, Instruction[]>} */
 const instructionsMap = new Map();
+/** @type {Instruction[]} */
 const instructionsArr = [];
 
 for (const instructions of rawInstructions.split("\n")) {
     const match = instructions.match(/{(.*?)}/);
     const words = instructions.match(/\w+/g);
-    console.log(match[1].split(","), words[0]);
 
-    instructionsMap.set(words[0], match[1].split(","));
-    instructionsArr.push({ instruction: words[0], value: match[1].split(",") });
+    /** @type {Instruction[]} */
+    const inss = [];
 
-    // const [instruction, value] = instructions.split(" ");
-    // instructionsMap.set(instruction, value);
-    // instructions.push({ instruction, value });
+    for (const i of match[1].split(",")) {
+        const ws = i.match(/\w+/g);
+
+        /** @type {Instruction} */
+        let x = {
+            gt: false,
+            lt: false,
+            compareVar: "",
+            target: "",
+            value: 0,
+        };
+
+        if (ws.length === 1) {
+            x.target = ws[0];
+            inss.push(x);
+            continue;
+        }
+
+        if (ws.length === 3) {
+            if (i.includes(">")) {
+                x.gt = true;
+            }
+
+            if (i.includes("<")) {
+                x.lt = true;
+            }
+
+            x.compareVar = ws[0];
+            x.target = ws[2];
+            x.value = Number(ws[1]);
+        }
+
+        inss.push(x);
+    }
+
+    instructionsMap.set(words[0], inss);
+    instructionsArr.push(inss);
 }
 
 const outputParts = [];
 
 for (const part of parts) {
-    const ins = instructionsArr[0];
+    let workflow = instructionsMap.get("in");
 
     while (true) {
+        let done = false;
         // evaluate ins
-        if (ins.instruction.includes("<") || ins.instruction.includes(">")) {
+        for (const ins of workflow) {
+            if (ins.gt) {
+                if (part[ins.compareVar] > ins.value) {
+                    if (ins.target === "R") {
+                        done = true;
+                        break;
+                    }
+                    if (ins.target === "A") {
+                        outputParts.push(part);
+
+                        done = true;
+                        break;
+                    }
+
+                    workflow = instructionsMap.get(ins.target);
+                    break;
+                }
+            }
+
+            if (ins.lt) {
+                if (part[ins.compareVar] < ins.value) {
+                    if (ins.target === "R") {
+                        done = true;
+                        break;
+                    }
+                    if (ins.target === "A") {
+                        outputParts.push(part);
+                        done = true;
+                        break;
+                    }
+
+                    workflow = instructionsMap.get(ins.target);
+                    break;
+                }
+            }
+
+            if (!ins.gt && !ins.lt) {
+                if (ins.target === "R") {
+                    done = true;
+                    console.log("reject");
+                    break;
+                }
+
+                if (ins.target === "A") {
+                    outputParts.push(part);
+                    done = true;
+                    break;
+                }
+
+                workflow = instructionsMap.get(ins.target);
+                break;
+            }
         }
-
-        if (ins.instruction === "A") {
-            // outputParts.push({ x: ins.value[0] })
-        }
-
-        if (ins.instruction === "R") {
-            // outputParts.push({ s: ins.value[0] })
-        }
-
-        // just a string and jump to next workflow
-
-        break;
+        if (done) break;
     }
-
-    // for (const i of ins) {
-    //     //
-    // }
 }
 
 const output = outputParts.reduce(

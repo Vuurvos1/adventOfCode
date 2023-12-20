@@ -7,7 +7,7 @@ import clipboard from "clipboardy";
 
 const input = fs.readFileSync("./2023/20/input.txt", "utf8").trim().split("\n");
 
-/** @typedef {{ type: '%' | '&', name: string, state: 'off' | 'on', connected: string[], inputs: Map<string, 'on' | 'off'> }} Module */
+/** @typedef {{ type: '%' | '&' | 'b', name: string, state: 'high' | 'low', connected: string[], inputs: Map<string, 'high' | 'low'> }} Module */
 
 /** @type {Map<string, Module>} */
 const modules = new Map();
@@ -16,12 +16,14 @@ for (const line of input) {
     const [key, value] = line.split(" -> ");
 
     const name = key.match(/(\w+)/g);
+    if (!name) continue;
 
     /** @type {Module} */
     const module = {
+        // @ts-ignore
         type: key[0],
         name: name[0],
-        state: "off", // or on
+        state: "low", // or on
         connected: value.split(", "),
         inputs: new Map(),
     };
@@ -34,148 +36,147 @@ for (const line of input) {
     const name = key.match(/(\w+)/g);
     const values = value.split(" ");
 
+    if (!name) continue;
+
     for (const v of values) {
         const m = modules.get(v);
         if (!m) continue;
-        m.inputs.set(name[0], "off");
+        m.inputs.set(name[0], "low");
     }
 }
 
-let rxTime = 0;
-
 // vr is the module connected to xr
-const keys = modules.get("vr").inputs.keys();
 
-const broadcaster = modules.get("broadcaster");
+/** @type {string[]} */
+// @ts-ignore
+const keys = modules.get("vr")?.inputs.keys();
 
-// TODO: name should probably renamed to "to"
-/** @typedef {{ name: string, pulse: 'low' | 'high': from: string  }} QueueItem */
+let satisfyFromId = "";
 
-const lcms = [];
+/** @typedef {{ from: string, to: string, pulseType: 'low' | 'high'  }} StackItem */
 
-for (const x of keys)
-    g: for (let i = 1; i < Infinity; i++) {
-        if (rxTime > 0) break;
+/** @type {StackItem[]} */
+let stack = [];
 
-        // "first button press"
-        /** @type {QueueItem[]} */
-        let queue = [
-            ...broadcaster.connected.map((name) => ({
-                name,
-                pulse: "low",
-                from: "broadcaster",
-            })),
-        ];
+let satisfied = false;
 
-        // if (i % 1_000_000 === 0) {
-        //     console.log("i", i, modules.get("vr"));
-        // }
-
-        while (true) {
-            if (queue.length === 0) break;
-            let tmpQueue = [];
-
-            const filtered = queue.filter((el) => el.name === x);
-            if (
-                filtered.length > 0 &&
-                filtered.every((f) => f.pulse === "low")
-            ) {
-                console.log(x, "found", queue, filtered);
-                lcms.push(i);
-                break g;
-            }
-
-            // TODO: rename module to queueItem
-            for (const module of queue) {
-                // if (module.name === x && module.pulse === "low") {
-                //     if (c > 0) {
-
-                //     }
-                //     c++;
-                // }
-
-                // if (module.name === "rx" && module.pulse === "low") {
-                //     rxTime = i;
-                // }
-
-                /** @type {Module} */
-                const m = modules.get(module.name);
-
-                if (!m) continue;
-
-                if (m.type === "%") {
-                    if (module.pulse === "high") continue;
-
-                    // low pulse
-                    if (m.state === "off") {
-                        m.state = "on";
-                        // send high pulse
-                        tmpQueue.push(
-                            ...m.connected.map((name) => ({
-                                name,
-                                pulse: "high",
-                                from: m.name,
-                            }))
-                        );
-                    } else {
-                        m.state = "off";
-
-                        // send low pulse
-                        tmpQueue.push(
-                            ...m.connected.map((name) => ({
-                                name,
-                                pulse: "low",
-                                from: m.name,
-                            }))
-                        );
-                    }
-                }
-
-                if (m.type === "&") {
-                    // off === low, on === high
-                    // udpate memory
-                    m.inputs.set(
-                        module.from,
-                        module.pulse === "low" ? "off" : "on"
-                    );
-
-                    const areAllOn = Array.from(m.inputs.values()).every(
-                        (value) => {
-                            return value === "on";
-                        }
-                    );
-
-                    if (areAllOn) {
-                        tmpQueue.push(
-                            ...m.connected.map((name) => ({
-                                name,
-                                pulse: "low",
-                                from: m.name,
-                            }))
-                        );
-                    } else {
-                        // otherwise send high pulse
-                        tmpQueue.push(
-                            ...m.connected.map((name) => ({
-                                name,
-                                pulse: "high",
-                                from: m.name,
-                            }))
-                        );
-                    }
-                }
-            }
-            queue = tmpQueue;
-        }
+/**
+ * @param {StackItem} stackItem
+ */
+function sendSignal({ from, to, pulseType }) {
+    if (from === satisfyFromId && pulseType === "high") {
+        // console.log("found", from, to, pulseType);
+        satisfied = true;
+        return;
     }
 
-// 11507884051950 low <
-// 23015768103900
-// 238920142622879
-// [ 4001, 3929, 3793, 4007 ]
-// const output = lowPulses * highPulses;
-const l = lib.lcm(...lcms);
+    const module = modules.get(to);
+    if (!module) return;
 
-console.info("time", l, rxTime, lcms);
-// console.info(output, lowPulses, highPulses);
+    if (module.type === "b") {
+        module.connected.forEach((out) =>
+            stack.push({
+                from: module.name,
+                to: out,
+                pulseType: pulseType,
+            })
+        );
+
+        return;
+    }
+
+    // flip flop
+    if (module.type === "%") {
+        if (pulseType === "low") {
+            if (module.state === "low") {
+                // send high pulse
+                module.state = "high";
+
+                module.connected.forEach((out) => {
+                    stack.push({
+                        from: module.name,
+                        to: out,
+                        pulseType: "high",
+                    });
+                });
+            } else {
+                // send low pulse
+                module.state = "low";
+
+                module.connected.forEach((out) => {
+                    stack.push({
+                        from: module.name,
+                        to: out,
+                        pulseType: "low",
+                    });
+                });
+            }
+        }
+
+        return;
+    }
+
+    // conjunction
+    if (module.type === "&") {
+        const m = modules.get(from);
+        if (!m) return;
+
+        // off === low, on === high
+
+        // udpate memory
+        m.inputs.set(module.name, pulseType);
+
+        const allAreOn = Array.from(m.inputs.values()).every(
+            (value) => value === "high"
+        );
+        console.log(m.inputs, allAreOn);
+
+        if (allAreOn) {
+            module.connected.forEach((out) => {
+                stack.push({
+                    from: module.name,
+                    to: out,
+                    pulseType: "low",
+                });
+            });
+        } else {
+            module.connected.forEach((out) => {
+                stack.push({
+                    from: module.name,
+                    to: out,
+                    pulseType: "high",
+                });
+            });
+        }
+    }
+}
+
+const hits = [];
+
+for (const x of keys) {
+    console.log(x);
+    satisfyFromId = x;
+    satisfied = false;
+    let i = 0;
+
+    while (satisfied === false) {
+        stack.push({
+            to: "broadcaster",
+            from: "button",
+            pulseType: "low",
+        });
+        while (stack.length) {
+            // @ts-ignore
+            sendSignal(stack.shift());
+        }
+        i++;
+    }
+
+    hits.push(i);
+}
+
+// [ 4001, 3929, 3793, 4007 ]
+console.log("hits", hits, lib.lcm(...hits));
+
+// console.info(output);
 // clipboard.writeSync(String(output));

@@ -10,50 +10,51 @@ const input = fs
 const grid = new lib.Grid(input);
 
 const startPos = grid.findIndex((cell) => cell === "S");
-
 console.log(startPos);
 
-// get all end positions that could be reached in 6 steps from start position traveling in the cardianl directions
-// on a 2d grid start from startPos
 const endPositions = new Set();
+const startKey = `${startPos.x},${startPos.y}`;
+endPositions.add(startKey);
 const visited = new Set();
 
-/**
- * @param {*} pos
- * @param {number} steps
- * @returns
- */
-function getEndPositions(pos, steps) {
-    if (steps === 0) {
-        endPositions.add(`${pos.x},${pos.y}`);
-        return;
-    }
+const queue = [{ ...startPos, steps: 64 }];
 
-    if (visited.has(`${pos.x},${pos.y},${steps}`)) return;
+console.time("t");
+
+// flood fill to get all plots visited
+while (queue.length > 0) {
+    const pos = queue.shift();
+    if (!pos) continue;
+
+    if (pos.steps === 0) continue;
 
     for (const dir of lib.cardinalDirections) {
         const newX = pos.x + dir.x;
         const newY = pos.y + dir.y;
 
+        const key = `${newX},${newY}`;
+        if (visited.has(key)) continue;
+
         if (!lib.isInbounds(newX, newY, input)) continue;
 
-        const neighbor = input[newX][newY];
+        const neighbor = input[newY][newX];
         if (neighbor === "#") continue;
 
-        // if (visited.has(neighbor)) continue;
-        // visited.add(neighbor);
-
-        const key = `${newX},${newY},${steps}`;
-
+        queue.push({ x: newX, y: newY, steps: pos.steps - 1 });
         visited.add(key);
-        getEndPositions({ x: newX, y: newY }, steps - 1);
     }
-
-    return;
 }
 
-console.time("t");
-getEndPositions(startPos, 64);
+// filter out spots that can't be reached
+for (const v of visited) {
+    const [x, y] = lib.parseNumbers(v);
+
+    if ((x + y) % 2 === 0) {
+        const key = `${x},${y}`;
+        endPositions.add(key);
+    }
+}
+
 console.timeEnd("t");
 
 let output = endPositions.size;
@@ -66,6 +67,11 @@ let output = endPositions.size;
 //     )
 //     .join("\n");
 
+const debugGrid = input
+    .map((row, y) =>
+        row.map((cell, x) => (visited.has(`${x},${y}`) ? "O" : cell)).join("")
+    )
+    .join("\n");
 // console.info(debugGrid);
 
 console.info(output);

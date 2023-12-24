@@ -14,6 +14,9 @@ importers:
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1
+      z3-solver:
+        specifier: ^4.12.4
+        version: 4.12.4
     devDependencies:
       lib:
         specifier: workspace:^
@@ -37,6 +40,12 @@ packages:
       normalize-path: 3.0.0
       picomatch: 2.3.1
     dev: true
+
+  /async-mutex@0.3.2:
+    resolution: {integrity: sha512-HuTK7E7MT7jZEh1P9GtRW9+aTWiDWWi9InbZ5hjxrnRa39KS4BW04+xLBhYNS2aXhHUIKZSw3gj4Pn1pj+qGAA==}
+    dependencies:
+      tslib: 2.6.2
+    dev: false
 
   /balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -385,6 +394,10 @@ packages:
       nopt: 1.0.10
     dev: true
 
+  /tslib@2.6.2:
+    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
+    dev: false
+
   /undefsafe@2.0.5:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
     dev: true
@@ -395,4 +408,11 @@ packages:
     hasBin: true
     dependencies:
       isexe: 2.0.0
+    dev: false
+
+  /z3-solver@4.12.4:
+    resolution: {integrity: sha512-B9ymul40bvtGSW0OQYfcYan1EhGm0JV/HgbO24JikIhuEOUv2+mdcOVd4V3q89UOx2mA0MOv+6d5msVF+/yJ6g==}
+    engines: {node: '>=16'}
+    dependencies:
+      async-mutex: 0.3.2
     dev: false

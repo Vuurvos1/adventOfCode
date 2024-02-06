@@ -9,3 +9,16 @@ tmp.js
 
 .env
 !.env.example
+
+
+# Rust related
+debug/
+target/
+
+Cargo.lock
+
+**/*.rs.bk
+
+*.pdb
+
+*.exe

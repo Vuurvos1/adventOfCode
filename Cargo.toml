@@ -1,6 +1,6 @@
 [workspace]
 members = [
   "2016/*"
-]
+, "2017/d01", "2017/d02"]
 
 [workspace.dependencies]

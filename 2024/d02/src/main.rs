@@ -62,12 +62,6 @@ fn p2() {
     for line in contents.lines() {
         let split = line.split_whitespace().map(|x| x.parse::<i32>().unwrap());
         let v: Vec<i32> = split.collect();
-        let safe = isSafeReport(v.clone());
-        if safe {
-            sum += 1;
-            continue;
-        }
-
         for i in 0..v.len() {
             let mut c = v.clone();
             c.remove(i);

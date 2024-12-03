@@ -16,10 +16,8 @@ fn p1() {
     let re = Regex::new(r"mul\(([0-9]{1,3}),([0-9]{1,3})\)").expect("Invalid regex");
 
     let mut sum = 0;
-    for line in input.lines() {
-        for (_, [d1, d2]) in re.captures_iter(line).map(|c| c.extract()) {
-            sum += d1.parse::<i32>().unwrap() * d2.parse::<i32>().unwrap()
-        }
+    for (_, [d1, d2]) in re.captures_iter(input.as_str()).map(|c| c.extract()) {
+        sum += d1.parse::<i32>().unwrap() * d2.parse::<i32>().unwrap()
     }
 
     println!("Hello, world! {}", sum);
@@ -37,19 +35,17 @@ fn p2() {
 
     let mut sum = 0;
     let mut mult = true;
-    for line in input.lines() {
-        for (_, [token]) in re.captures_iter(line).map(|c| c.extract()) {
-            match token {
-                "do()" => mult = true,
-                "don't()" => mult = false,
-                _ => {
-                    if !mult {
-                        continue;
-                    }
+    for (_, [token]) in re.captures_iter(input.as_str()).map(|c| c.extract()) {
+        match token {
+            "do()" => mult = true,
+            "don't()" => mult = false,
+            _ => {
+                if !mult {
+                    continue;
+                }
 
-                    for (_, [d1, d2]) in digit_re.captures_iter(token).map(|c| c.extract()) {
-                        sum += d1.parse::<i32>().unwrap() * d2.parse::<i32>().unwrap()
-                    }
+                for (_, [d1, d2]) in digit_re.captures_iter(token).map(|c| c.extract()) {
+                    sum += d1.parse::<i32>().unwrap() * d2.parse::<i32>().unwrap()
                 }
             }
         }

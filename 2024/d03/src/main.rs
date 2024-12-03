@@ -13,7 +13,7 @@ fn p1() {
         .trim_end()
         .to_string();
 
-    let re = Regex::new(r"mul\(([0-9]{1,3}),([0-9]{1,3})\)").expect("Invalid regex");
+    let re = Regex::new(r"mul\((\d+),(\d+)\)").expect("Invalid regex");
 
     let mut sum = 0;
     for (_, [d1, d2]) in re.captures_iter(input.as_str()).map(|c| c.extract()) {
@@ -30,7 +30,7 @@ fn p2() {
         .trim_end()
         .to_string();
 
-    let re = Regex::new(r"(mul\([0-9]{1,3},[0-9]{1,3}\)|do\(\)|don't\(\))").expect("Invalid regex");
+    let re = Regex::new(r"(mul\(\d+,\d+\)|do\(\)|don't\(\))").expect("Invalid regex");
     let digit_re = Regex::new(r"(\d+),(\d+)").expect("Invalid digit regex");
 
     let mut sum = 0;

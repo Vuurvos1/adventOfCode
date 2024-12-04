@@ -21,76 +21,82 @@ fn p1() {
     // look for XMAS in all directions in grid
     for i in 0..grid.len() {
         for j in 0..grid[i].len() {
-            if grid[i][j] == 'X' {
-                // check up
-                if i > 2 && grid[i - 1][j] == 'M' && grid[i - 2][j] == 'A' && grid[i - 3][j] == 'S'
-                {
-                    total += 1;
-                }
+            if grid[i][j] != 'X' {
+                continue;
+            }
 
-                // check down
-                if i < grid.len() - 3
-                    && grid[i + 1][j] == 'M'
-                    && grid[i + 2][j] == 'A'
-                    && grid[i + 3][j] == 'S'
-                {
-                    total += 1;
-                }
+            // check up
+            if i > 2 && grid[i - 1][j] == 'M' && grid[i - 2][j] == 'A' && grid[i - 3][j] == 'S' {
+                total += 1;
+                continue;
+            }
 
-                // check left
-                if j > 2 && grid[i][j - 1] == 'M' && grid[i][j - 2] == 'A' && grid[i][j - 3] == 'S'
-                {
-                    total += 1;
-                }
+            // check down
+            if i < grid.len() - 3
+                && grid[i + 1][j] == 'M'
+                && grid[i + 2][j] == 'A'
+                && grid[i + 3][j] == 'S'
+            {
+                total += 1;
+                continue;
+            }
 
-                // check right
-                if j < grid[i].len() - 3
-                    && grid[i][j + 1] == 'M'
-                    && grid[i][j + 2] == 'A'
-                    && grid[i][j + 3] == 'S'
-                {
-                    total += 1;
-                }
+            // check left
+            if j > 2 && grid[i][j - 1] == 'M' && grid[i][j - 2] == 'A' && grid[i][j - 3] == 'S' {
+                total += 1;
+            }
 
-                // check up-left
-                if i > 2
-                    && j > 2
-                    && grid[i - 1][j - 1] == 'M'
-                    && grid[i - 2][j - 2] == 'A'
-                    && grid[i - 3][j - 3] == 'S'
-                {
-                    total += 1;
-                }
+            // check right
+            if j < grid[i].len() - 3
+                && grid[i][j + 1] == 'M'
+                && grid[i][j + 2] == 'A'
+                && grid[i][j + 3] == 'S'
+            {
+                total += 1;
+                continue;
+            }
 
-                // check up-right
-                if i > 2
-                    && j < grid[i].len() - 3
-                    && grid[i - 1][j + 1] == 'M'
-                    && grid[i - 2][j + 2] == 'A'
-                    && grid[i - 3][j + 3] == 'S'
-                {
-                    total += 1;
-                }
+            // check up-left
+            if i > 2
+                && j > 2
+                && grid[i - 1][j - 1] == 'M'
+                && grid[i - 2][j - 2] == 'A'
+                && grid[i - 3][j - 3] == 'S'
+            {
+                total += 1;
+                continue;
+            }
 
-                // check down-left
-                if i < grid.len() - 3
-                    && j > 2
-                    && grid[i + 1][j - 1] == 'M'
-                    && grid[i + 2][j - 2] == 'A'
-                    && grid[i + 3][j - 3] == 'S'
-                {
-                    total += 1;
-                }
+            // check up-right
+            if i > 2
+                && j < grid[i].len() - 3
+                && grid[i - 1][j + 1] == 'M'
+                && grid[i - 2][j + 2] == 'A'
+                && grid[i - 3][j + 3] == 'S'
+            {
+                total += 1;
+                continue;
+            }
 
-                // check down-right
-                if i < grid.len() - 3
-                    && j < grid[i].len() - 3
-                    && grid[i + 1][j + 1] == 'M'
-                    && grid[i + 2][j + 2] == 'A'
-                    && grid[i + 3][j + 3] == 'S'
-                {
-                    total += 1;
-                }
+            // check down-left
+            if i < grid.len() - 3
+                && j > 2
+                && grid[i + 1][j - 1] == 'M'
+                && grid[i + 2][j - 2] == 'A'
+                && grid[i + 3][j - 3] == 'S'
+            {
+                total += 1;
+                continue;
+            }
+
+            // check down-right
+            if i < grid.len() - 3
+                && j < grid[i].len() - 3
+                && grid[i + 1][j + 1] == 'M'
+                && grid[i + 2][j + 2] == 'A'
+                && grid[i + 3][j + 3] == 'S'
+            {
+                total += 1;
             }
         }
     }

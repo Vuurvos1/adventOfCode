@@ -21,11 +21,10 @@ fn p1() {
     }
 
     let pages_input = split_input[1];
-    let mut pages: Vec<Vec<i32>> = Vec::new();
-    for page in pages_input.lines() {
-        let split: Vec<i32> = page.split(",").map(|x| x.parse::<i32>().unwrap()).collect();
-        pages.push(split);
-    }
+    let pages = pages_input
+        .lines()
+        .map(|x| x.split(",").map(|x| x.parse::<i32>().unwrap()).collect())
+        .collect::<Vec<Vec<i32>>>();
 
     let mut sum = 0;
 
@@ -38,11 +37,11 @@ fn p1() {
                 break;
             }
 
-            let p = page[i];
-            let rule = rules.entry(p).or_insert(Vec::new());
-            if rule.len() == 0 {
+            if !rules.contains_key(&page[i]) {
                 continue;
             }
+
+            let rule = rules.get(&page[i]).unwrap();
 
             // slice before
             let slice = &page[0..i];

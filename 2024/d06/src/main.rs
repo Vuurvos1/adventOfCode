@@ -62,7 +62,7 @@ fn p1() {
 }
 
 fn concat_digits(a: i16, b: i16, c: i16, d: i16) -> u64 {
-    // I doubt this is faster than just adding a 4 tuple but it's fun
+    // I doubt this is faster than just having a 4 tuple set but it's fun
     ((a as u64 & 0xffff) << 48)
         | ((b as u64 & 0xffff) << 32)
         | ((c as u64 & 0xffff) << 16)
@@ -125,12 +125,14 @@ fn p2() {
 
         base_path.insert(pos);
     }
+    base_path.remove(&start_pos); // check the start position
 
     for p in base_path.iter() {
         let (y, x) = p;
 
         pos = start_pos.clone();
         let mut direction: (i16, i16) = (-1, 0);
+        // let mut visited: HashSet<(i16, i16, i16, i16)> = HashSet::with_capacity(500);
         let mut visited: HashSet<u64> = HashSet::with_capacity(500);
 
         loop {
@@ -145,6 +147,7 @@ fn p2() {
             }
 
             let key = concat_digits(pos.0, pos.1, direction.0, direction.1);
+            // let key = (pos.0, pos.1, direction.0, direction.1);
             if visited.contains(&key) && visited.len() > 1 {
                 blockades += 1;
                 break;

@@ -1,3 +1,4 @@
+use core::net;
 use std::{fs, time::Instant};
 
 fn main() {
@@ -22,52 +23,46 @@ fn p1() {
         .trim_end()
         .to_string();
 
-    let mut disk: Vec<String> = Vec::new();
+    let mut disk: Vec<i64> = Vec::new();
 
     let mut file_index = 0;
+    let mut digit_count: usize = 0;
     for (i, c) in input.chars().enumerate() {
         let size = c.to_digit(10).unwrap();
         if i % 2 == 0 {
             // file block
-            let index_char = file_index.to_string();
             for _j in 0..size {
-                disk.push(index_char.clone());
+                disk.push(file_index);
+                digit_count += 1;
             }
             file_index += 1;
         } else {
             // padding block
             for _j in 0..size {
-                disk.push(String::from("."));
+                disk.push(-1);
             }
         }
     }
 
     // println!("{:?} disk", disk);
 
-    let mut non_dot_count = 0;
-    for d in disk.iter() {
-        if d.to_string() != "." {
-            non_dot_count += 1;
-        }
-    }
-
-    for i in 0..non_dot_count {
-        // if dot
-        if disk[i] == "." {
+    let mut skip_count = disk.len();
+    for i in 0..digit_count {
+        // if dotz
+        if disk[i] == -1 {
             // get last item from disk that is not '.'
-            let last_not_dot = disk.iter().rposition(|x| x != ".").unwrap();
+            let last_not_dot = disk[0..skip_count].iter().rposition(|x| *x != -1).unwrap();
             disk.swap(i, last_not_dot);
-            disk.pop();
+            skip_count = last_not_dot;
         }
     }
 
-    let mut sum: u64 = 0;
+    let mut sum: i64 = 0;
     for (i, d) in disk.iter().enumerate() {
-        if d.to_string() == "." {
+        if *d == -1 {
             break;
         }
-        let digit = d.parse::<u64>().unwrap();
-        sum += i as u64 * digit as u64;
+        sum += i as i64 * *d;
     }
 
     println!("Hello, world! {}", sum);
@@ -75,8 +70,8 @@ fn p1() {
 
 #[derive(Debug, Clone, Copy)]
 struct Space {
-    id: u64,
-    size: u64,
+    id: u32,
+    size: u32,
     file: bool,
     done: bool,
 }
@@ -117,7 +112,7 @@ fn p2() {
             // file block
             file_disk.push(Space {
                 id: file_index,
-                size: size as u64,
+                size: size,
                 file: true,
                 done: false,
             });
@@ -129,24 +124,26 @@ fn p2() {
         // padding block
         file_disk.push(Space {
             id: 0,
-            size: size as u64,
+            size: size,
             file: false,
             done: true,
         });
     }
 
     // when inserting into free space, if space left create a new free space at the start of the index
-    let mut _last_file_id = file_disk.iter().max_by_key(|x| x.id).unwrap().id;
+    let mut skip_count = file_disk.len();
     for _i in 0..file_disk.len() {
         // get last item from file_disk that is not free space
-        let last_file_index_opt = file_disk.iter().rposition(|x| x.file && !x.done);
+        let last_file_index_opt = file_disk[0..skip_count]
+            .iter()
+            .rposition(|x| x.file && !x.done);
         if last_file_index_opt.is_none() {
             continue;
         }
         let last_file_index = last_file_index_opt.unwrap();
         let last_file = file_disk[last_file_index];
         file_disk[last_file_index].done = true;
-        // last_file.done = true;
+        skip_count = last_file_index;
 
         // get first free space that fits
         let space_index = file_disk
@@ -189,35 +186,16 @@ fn p2() {
         }
     }
 
-    let now = Instant::now();
-    let mut sum: i64 = 0;
-    let mut disk: Vec<i64> = Vec::new();
+    let mut sum: u64 = 0;
+    let mut i: u64 = 0;
     for s in file_disk {
-        if s.file {
-            for _i in 0..s.size {
-                disk.push(s.id as i64)
+        for _ in 0..s.size {
+            if s.file {
+                sum += i * s.id as u64;
             }
-            continue;
-        }
-
-        // empty space
-        if !s.file {
-            for _i in 0..s.size {
-                disk.push(-1);
-            }
+            i += 1;
         }
     }
-
-    for (i, d) in disk.iter().enumerate() {
-        if *d < 0 {
-            continue;
-        }
-
-        sum += i as i64 * *d as i64
-    }
-
-    let elapsed = now.elapsed();
-    println!("sum: {:.2?}", elapsed);
 
     println!("Hello, world! {}", sum);
 }

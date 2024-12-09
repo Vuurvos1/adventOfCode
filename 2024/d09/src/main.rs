@@ -1,10 +1,8 @@
-use core::net;
 use std::{fs, time::Instant};
 
 fn main() {
     println!("Hello, world!");
 
-    // p1
     let mut now = Instant::now();
     p1();
     let mut elapsed = now.elapsed();
@@ -16,7 +14,6 @@ fn main() {
     println!("p2: {:.2?}", elapsed);
 }
 
-// #[test]
 fn p1() {
     let input = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
@@ -31,26 +28,23 @@ fn p1() {
         let size = c.to_digit(10).unwrap();
         if i % 2 == 0 {
             // file block
-            for _j in 0..size {
+            for _ in 0..size {
                 disk.push(file_index);
                 digit_count += 1;
             }
             file_index += 1;
         } else {
             // padding block
-            for _j in 0..size {
+            for _ in 0..size {
                 disk.push(-1);
             }
         }
     }
 
-    // println!("{:?} disk", disk);
-
     let mut skip_count = disk.len();
     for i in 0..digit_count {
-        // if dotz
         if disk[i] == -1 {
-            // get last item from disk that is not '.'
+            // get last item from disk that is non empty
             let last_not_dot = disk[0..skip_count].iter().rposition(|x| *x != -1).unwrap();
             disk.swap(i, last_not_dot);
             skip_count = last_not_dot;
@@ -76,27 +70,6 @@ struct Space {
     done: bool,
 }
 
-fn print_disk(file_disk: &Vec<Space>) {
-    for s in file_disk {
-        if s.file {
-            for _i in 0..s.size {
-                print!("{}", s.id);
-            }
-            continue;
-        }
-
-        // empty space
-        if !s.file {
-            for _i in 0..s.size {
-                print!(".");
-            }
-        }
-    }
-
-    println!()
-}
-
-// #[test]
 fn p2() {
     let input = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
@@ -132,7 +105,7 @@ fn p2() {
 
     // when inserting into free space, if space left create a new free space at the start of the index
     let mut skip_count = file_disk.len();
-    for _i in 0..file_disk.len() {
+    for _ in 0..file_index {
         // get last item from file_disk that is not free space
         let last_file_index_opt = file_disk[0..skip_count]
             .iter()

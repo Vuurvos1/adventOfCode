@@ -18,20 +18,12 @@ fn inbounds(x: i32, y: i32, width: usize, height: usize) -> bool {
     x >= 0 && x < width as i32 && y >= 0 && y < height as i32
 }
 
-// #[test]
 fn p1() {
-    let input = fs::read_to_string("./src/input.txt")
+    let grid: Vec<Vec<i32>> = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
         .trim_end()
-        .to_string();
-
-    let grid: Vec<Vec<i32>> = input
-        .split("\n")
-        .map(|line| {
-            line.chars()
-                .map(|c| c.to_digit(10).unwrap() as i32)
-                .collect::<Vec<i32>>()
-        })
+        .lines()
+        .map(|line| line.chars().map(|c| c as i32 - 48).collect())
         .collect();
 
     let mut start_positions: Vec<(i32, i32)> = Vec::new();
@@ -88,25 +80,12 @@ fn p1() {
     println!("Hello, world! {}", sum);
 }
 
-// #[test]
 fn p2() {
-    let input = fs::read_to_string("./src/input.txt")
+    let grid: Vec<Vec<i32>> = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
         .trim_end()
-        .to_string();
-
-    let grid: Vec<Vec<i32>> = input
-        .split("\n")
-        .map(|line| {
-            line.chars()
-                .map(|c| -> i32 {
-                    if c == '.' {
-                        return -1;
-                    }
-                    c.to_digit(10).unwrap() as i32
-                })
-                .collect::<Vec<i32>>()
-        })
+        .lines()
+        .map(|line| line.chars().map(|c| c as i32 - 48).collect())
         .collect();
 
     let mut start_positions: Vec<(i32, i32)> = Vec::new();

@@ -25,7 +25,7 @@ fn p1() {
     let mut file_index = 0;
     let mut digit_count: usize = 0;
     for (i, c) in input.chars().enumerate() {
-        let size = c.to_digit(10).unwrap();
+        let size = c as u32 - 48;
         if i % 2 == 0 {
             // file block
             for _ in 0..size {
@@ -46,8 +46,8 @@ fn p1() {
         if disk[i] == -1 {
             // get last item from disk that is non empty
             let last_not_dot = disk[0..skip_count].iter().rposition(|x| *x != -1).unwrap();
-            disk.swap(i, last_not_dot);
             skip_count = last_not_dot;
+            disk.swap(i, last_not_dot);
         }
     }
 
@@ -62,12 +62,33 @@ fn p1() {
     println!("Hello, world! {}", sum);
 }
 
+fn print_disk(file_disk: &Vec<Space>) {
+    for s in file_disk {
+        if s.file {
+            for _i in 0..s.size {
+                print!("{}", s.id);
+            }
+            continue;
+        }
+        // empty space
+        if !s.file {
+            for _i in 0..s.size {
+                print!(".");
+            }
+
+            if s.size == 0 {
+                print!("()");
+            }
+        }
+    }
+    println!()
+}
+
 #[derive(Debug, Clone, Copy)]
 struct Space {
     id: u32,
     size: u32,
     file: bool,
-    done: bool,
 }
 
 fn p2() {
@@ -80,14 +101,13 @@ fn p2() {
 
     let mut file_index = 0;
     for (i, c) in input.chars().enumerate() {
-        let size = c.to_digit(10).unwrap();
+        let size = c as u32 - 48;
         if i % 2 == 0 {
             // file block
             file_disk.push(Space {
                 id: file_index,
                 size: size,
                 file: true,
-                done: false,
             });
 
             file_index += 1;
@@ -99,23 +119,20 @@ fn p2() {
             id: 0,
             size: size,
             file: false,
-            done: true,
         });
     }
 
     // when inserting into free space, if space left create a new free space at the start of the index
     let mut skip_count = file_disk.len();
     for _ in 0..file_index {
-        // get last item from file_disk that is not free space
-        let last_file_index_opt = file_disk[0..skip_count]
-            .iter()
-            .rposition(|x| x.file && !x.done);
+        // get last file from file_disk
+        let last_file_index_opt = file_disk[0..skip_count].iter().rposition(|x| x.file);
         if last_file_index_opt.is_none() {
+            skip_count -= 1;
             continue;
         }
         let last_file_index = last_file_index_opt.unwrap();
         let last_file = file_disk[last_file_index];
-        file_disk[last_file_index].done = true;
         skip_count = last_file_index;
 
         // get first free space that fits
@@ -124,27 +141,17 @@ fn p2() {
             .position(|x| x.size >= last_file.size && !x.file);
 
         if let Some(space_index) = space_index {
-            let space = &mut file_disk[space_index];
-
+            // print_disk(&file_disk);
             if space_index > last_file_index {
                 continue;
             }
 
-            let space_left = space.size - last_file.size;
-            space.size = space_left;
+            let space_left = file_disk[space_index].size - last_file.size;
+            file_disk[space_index].size = space_left;
 
             // move last_file in front of space
             let item = file_disk.remove(last_file_index);
             file_disk.insert(space_index, item);
-
-            // if before or after is already empty space, merge
-            // if space_index > 0 {
-            //     let before = &mut file_disk[space_index - 1];
-            //     if !before.file {
-            //         before.size += last_file.size;
-            //         continue;
-            //     }
-            // }
 
             // insert empty space from where moved
             file_disk.insert(
@@ -153,9 +160,8 @@ fn p2() {
                     id: 0,
                     file: false,
                     size: item.size,
-                    done: true,
                 },
-            )
+            );
         }
     }
 

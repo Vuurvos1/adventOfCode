@@ -8,7 +8,7 @@ fn main() {
     let mut c2 = Vec::new();
 
     for line in contents.lines() {
-        let mut split = line.split_whitespace().map(|x| x.parse::<i32>().unwrap());
+        let mut split = line.split_whitespace().map(|x| x.parse::<u32>().unwrap());
         c1.push(split.next());
         c2.push(split.next());
     }
@@ -16,11 +16,11 @@ fn main() {
     c1.sort();
     c2.sort();
 
-    let mut sum = 0;
-    for (a, b) in c1.iter().zip(c2.iter()) {
-        let diff = a.unwrap() - b.unwrap();
-        sum += diff.abs();
-    }
+    let sum: u32 = c1
+        .iter()
+        .zip(c2.iter())
+        .map(|(a, b)| a.unwrap().abs_diff(b.unwrap()))
+        .sum();
 
     println!("Hello, world! {}", sum);
 }

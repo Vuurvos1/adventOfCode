@@ -1,22 +1,28 @@
-use std::fs;
+use std::{fs, time::Instant};
 
 fn main() {
-    println!("Hello, world!");
+    let mut now = Instant::now();
+    p1();
+    let mut elapsed = now.elapsed();
+    println!("p1: {:.2?}", elapsed);
+
+    now = Instant::now();
+    p2();
+    elapsed = now.elapsed();
+    println!("p2: {:.2?}", elapsed);
 }
 
 // recursive function to try all combinations of operations on all digits
-fn math_numbers(sum: i64, awnser: i64, digits: Vec<i64>, operations: &Vec<char>) -> (i64, bool) {
+fn math_numbers(sum: i64, awnser: i64, digits: &Vec<i64>, operations: &Vec<char>) -> bool {
     if digits.len() == 0 {
-        // bool to keep track if reached the bottom of the recursion
-        return (sum, true);
+        return sum == awnser;
     }
 
     // prune branches that are already too big
     if sum > awnser {
-        return (0, false);
+        return false;
     }
 
-    // TODO: maybe clone less, and instead pass an index to the digits vector
     let mut new_digits = digits.clone();
     let digit = new_digits.remove(0);
 
@@ -25,21 +31,19 @@ fn math_numbers(sum: i64, awnser: i64, digits: Vec<i64>, operations: &Vec<char>)
         match op {
             '+' => new_sum += digit,
             '*' => new_sum *= digit,
-            '|' => new_sum = format!("{}{}", sum, digit).parse::<i64>().unwrap(),
+            '|' => new_sum = sum * 10_i64.pow(digit.to_string().len() as u32) + digit,
             _ => panic!("Unknown operation"),
         }
 
-        let new_result = math_numbers(new_sum, awnser, new_digits.clone(), operations);
-
-        if new_result.0 == awnser && new_result.1 == true {
+        let new_result = math_numbers(new_sum, awnser, &new_digits, operations);
+        if new_result {
             return new_result;
         }
     }
 
-    return (0, false);
+    return false;
 }
 
-#[test]
 fn p1() {
     let input = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
@@ -60,9 +64,8 @@ fn p1() {
             .collect::<Vec<i64>>();
 
         // try all combinations of operations on all digits to see if one procudes the awnser
-        let result = math_numbers(digits[0], awnser, digits[1..].to_vec(), &operations);
-        println!("{}: {}", awnser, result.0);
-        if result.0 != 0 {
+        let result = math_numbers(digits[0], awnser, &digits[1..].to_vec(), &operations);
+        if result {
             sum += awnser;
         }
     }
@@ -70,7 +73,6 @@ fn p1() {
     println!("Hello, world! {}", sum);
 }
 
-#[test]
 fn p2() {
     let input = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
@@ -91,9 +93,8 @@ fn p2() {
             .collect::<Vec<i64>>();
 
         // try all combinations of operations on all digits to see if one procudes the awnser
-        let result = math_numbers(digits[0], awnser, digits[1..].to_vec(), &operations);
-        println!("{}: {}", awnser, result.0);
-        if result.0 != 0 {
+        let result = math_numbers(digits[0], awnser, &digits[1..].to_vec(), &operations);
+        if result {
             sum += awnser;
         }
     }

@@ -6,6 +6,7 @@ output.txt
 output.gv
 tmp.txt
 tmp.js
+tmp/
 
 .env
 !.env.example

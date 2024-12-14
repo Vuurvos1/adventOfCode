@@ -48,12 +48,12 @@ fn move_claw(a_button: (f64, f64), b_button: (f64, f64), pos: (f64, f64), p1: bo
 }
 
 fn p1() {
+    let re = Regex::new(r"\d+").expect("Invalid regex");
     let input: Vec<Vec<f64>> = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
         .trim_end()
         .split("\n\n")
         .map(|line| {
-            let re = Regex::new(r"\d+").expect("Invalid regex");
             let digits: Vec<f64> = re
                 .find_iter(line) // Find all matches
                 .filter_map(|mat| mat.as_str().parse::<f64>().ok()) // Attempt to parse to i32, filter out errors
@@ -72,12 +72,12 @@ fn p1() {
 }
 
 fn p2() {
+    let re = Regex::new(r"\d+").expect("Invalid regex");
     let input: Vec<Vec<f64>> = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
         .trim_end()
         .split("\n\n")
         .map(|line| {
-            let re = Regex::new(r"\d+").expect("Invalid regex");
             let digits: Vec<f64> = re
                 .find_iter(line) // Find all matches
                 .filter_map(|mat| mat.as_str().parse::<f64>().ok()) // Attempt to parse to i32, filter out errors

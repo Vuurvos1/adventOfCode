@@ -33,12 +33,12 @@ fn walk_robot(p: (i32, i32), v: (i32, i32), steps: i32) -> (i32, i32) {
 }
 
 fn p1() {
+    let re = Regex::new(r"-?\d+").expect("Invalid regex");
     let input: Vec<Vec<i32>> = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
         .trim_end()
         .lines()
         .map(|line| {
-            let re = Regex::new(r"-?\d+").expect("Invalid regex");
             let digits: Vec<i32> = re
                 .find_iter(line) // Find all matches
                 .filter_map(|mat| mat.as_str().parse::<i32>().ok()) // Attempt to parse to i32, filter out errors
@@ -70,8 +70,6 @@ fn p1() {
         }
     }
 
-    println!("{:?}", quadrant_scores);
-
     // multiply together
     let sum: u64 = quadrant_scores.iter().product();
     println!("Hello, world! {}", sum);
@@ -94,12 +92,12 @@ fn points_to_grid_string(points: &Vec<(i32, i32)>) -> String {
 }
 
 fn p2() {
+    let re = Regex::new(r"-?\d+").expect("Invalid regex");
     let input: Vec<Vec<i32>> = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
         .trim_end()
         .lines()
         .map(|line| {
-            let re = Regex::new(r"-?\d+").expect("Invalid regex");
             let digits: Vec<i32> = re
                 .find_iter(line) // Find all matches
                 .filter_map(|mat| mat.as_str().parse::<i32>().ok()) // Attempt to parse to i32, filter out errors

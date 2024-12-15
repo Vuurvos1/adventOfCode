@@ -124,6 +124,8 @@ fn p2() {
     // vertical:   y = 101x + 11
     // horizontal: y = 103x + 65
     // then I just plotted a bunch of grids with the intervals till I found the right one
+    // Also these 2 lines intersect at x = -27 and y = -2716 and the lcm of 101 and 103 is 10,403
+    // so if you add 10403 to the y you should see the christmas tree at that timestamp
 
     for i in (65..15000).step_by(103) {
         let mut end_positions: Vec<(i32, i32)> = Vec::new();

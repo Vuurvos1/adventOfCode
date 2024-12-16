@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{HashMap, HashSet, VecDeque},
     fs,
     time::Instant,
 };
@@ -43,12 +43,12 @@ fn p1() -> u64 {
     }
 
     let mut cache: HashMap<(i32, i32, i32, i32), u64> = HashMap::new();
-    let mut stack: Vec<((i32, i32), (i32, i32), u64)> = Vec::new();
+    let mut stack: VecDeque<((i32, i32), (i32, i32), u64)> = VecDeque::new();
     let mut min: u64 = u64::MAX;
-    stack.push((start_pos, (0, 1), 0));
+    stack.push_back((start_pos, (0, 1), 0));
 
     while stack.len() > 0 {
-        let (pos, dir, score) = stack.pop().unwrap();
+        let (pos, dir, score) = stack.pop_front().unwrap();
 
         // update cache score if current score is lower
         if cache.contains_key(&(pos.0, pos.1, dir.0, dir.1)) {
@@ -69,21 +69,19 @@ fn p1() -> u64 {
             continue;
         }
 
-        // rotate clockwise or counterclockwise for 1000 cost
-        let new_dir = (dir.1, -dir.0);
-        stack.push((pos, new_dir, score + 1000));
-        let new_dir = (-dir.1, dir.0);
-        stack.push((pos, new_dir, score + 1000));
-
         // move forward for 1 cost
         let new_pos = (pos.0 + dir.0, pos.1 + dir.1);
-        if !inbounds(new_pos.1, new_pos.0, &grid) {
-            continue;
+        if inbounds(new_pos.1, new_pos.0, &grid)
+            && grid[new_pos.0 as usize][new_pos.1 as usize] != '#'
+        {
+            stack.push_back((new_pos, dir, score + 1));
         }
-        if grid[new_pos.0 as usize][new_pos.1 as usize] == '#' {
-            continue;
-        }
-        stack.push((new_pos, dir, score + 1));
+
+        // rotate clockwise or counterclockwise for 1000 cost
+        let new_dir = (dir.1, -dir.0);
+        stack.push_back((pos, new_dir, score + 1000));
+        let new_dir = (-dir.1, dir.0);
+        stack.push_back((pos, new_dir, score + 1000));
     }
 
     println!("Hello, world! {}", min);
@@ -109,13 +107,13 @@ fn p2(p1_score: u64) {
     }
 
     let mut cache: HashMap<(i32, i32, i32, i32), u64> = HashMap::new();
-    let mut stack: Vec<((i32, i32), (i32, i32), u64, Vec<(i32, i32)>)> = Vec::new();
+    let mut stack: VecDeque<((i32, i32), (i32, i32), u64, Vec<(i32, i32)>)> = VecDeque::new();
     let mut path_tiles: HashSet<(i32, i32)> = HashSet::new();
     let mut min: u64 = u64::MAX;
-    stack.push((start_pos, (0, 1), 0, Vec::new()));
+    stack.push_back((start_pos, (0, 1), 0, Vec::new()));
 
     while stack.len() > 0 {
-        let (pos, dir, score, path) = stack.pop().unwrap();
+        let (pos, dir, score, path) = stack.pop_front().unwrap();
         let mut path = path.clone();
         path.push(pos);
 
@@ -135,29 +133,24 @@ fn p2(p1_score: u64) {
         if grid[pos.0 as usize][pos.1 as usize] == 'E' {
             // println!("Found it! {}", score);
             min = min.min(score);
-            for tile in path {
-                path_tiles.insert(tile);
-            }
+            path_tiles.extend(path);
             continue;
+        }
+
+        // move forward for 1 cost
+        let new_pos = (pos.0 + dir.0, pos.1 + dir.1);
+        if inbounds(new_pos.1, new_pos.0, &grid)
+            && grid[new_pos.0 as usize][new_pos.1 as usize] != '#'
+        {
+            stack.push_back((new_pos, dir, score + 1, path.clone()));
         }
 
         // rotate clockwise or counterclockwise for 1000 cost
         let new_dir = (dir.1, -dir.0);
-        stack.push((pos, new_dir, score + 1000, path.clone()));
+        stack.push_back((pos, new_dir, score + 1000, path.clone()));
         let new_dir = (-dir.1, dir.0);
-        stack.push((pos, new_dir, score + 1000, path.clone()));
-
-        // move forward for 1 cost
-        let new_pos = (pos.0 + dir.0, pos.1 + dir.1);
-        if !inbounds(new_pos.1, new_pos.0, &grid) {
-            continue;
-        }
-        if grid[new_pos.0 as usize][new_pos.1 as usize] == '#' {
-            continue;
-        }
-        stack.push((new_pos, dir, score + 1, path.clone()));
+        stack.push_back((pos, new_dir, score + 1000, path.clone()));
     }
 
-    // let sum = walk_deer(start_pos, (0, 1), &grid, 0, &mut min);
-    println!("Hello, world! {} {}", min, path_tiles.len());
+    println!("Hello, world! {}", path_tiles.len());
 }

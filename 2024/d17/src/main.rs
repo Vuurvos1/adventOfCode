@@ -16,7 +16,7 @@ fn main() {
     println!("p2: {:.2?}", elapsed);
 }
 
-fn combo_operand(operand: u64, register: &Vec<u64>) -> u64 {
+fn combo(operand: u64, register: &Vec<u64>) -> u64 {
     match operand {
         4 => register[0],
         5 => register[1],
@@ -30,7 +30,7 @@ fn run_program(a: u64, b: u64, c: u64, stack: &Vec<u64>) -> Vec<u64> {
     let mut register: Vec<u64> = vec![a, b, c];
     let mut pointer = 0;
 
-    while pointer < stack.len() - 1 {
+    while pointer < stack.len() {
         let opcode = stack[pointer];
         let operand = stack[pointer + 1];
 
@@ -38,7 +38,7 @@ fn run_program(a: u64, b: u64, c: u64, stack: &Vec<u64>) -> Vec<u64> {
         match opcode {
             0 => {
                 // adv - divide A by 2^value (implemented as right shift)
-                // register[0] /= 2_u64.pow(combo_operand(operand, &register) as u32);
+                register[0] >>= combo(operand, &register);
             }
             1 => {
                 // bxl - XOR B with literal operand
@@ -46,7 +46,7 @@ fn run_program(a: u64, b: u64, c: u64, stack: &Vec<u64>) -> Vec<u64> {
             }
             2 => {
                 // bst - set B to value mod 8
-                register[1] = combo_operand(operand, &register) % 8;
+                register[1] = combo(operand, &register) % 8;
             }
             3 => {
                 // jnz - jump if A is not zero
@@ -60,15 +60,15 @@ fn run_program(a: u64, b: u64, c: u64, stack: &Vec<u64>) -> Vec<u64> {
             }
             5 => {
                 // out - output value mod 8
-                out.push(combo_operand(operand, &register) % 8);
+                out.push(combo(operand, &register) % 8);
             }
             6 => {
                 // bdv - divide A by 2^value, store in B
-                register[1] = register[0] / 2_u64.pow(combo_operand(operand, &register) as u32);
+                register[1] = register[0] >> combo(operand, &register);
             }
             7 => {
                 // cdv - divide A by 2^value, store in C
-                register[2] = register[0] / 2_u64.pow(combo_operand(operand, &register) as u32);
+                register[2] = register[0] >> combo(operand, &register);
             }
             _ => unreachable!(),
         }
@@ -119,7 +119,6 @@ fn p2() {
     let mut a: u64 = 0;
     for pos in (0..stack.len()).rev() {
         a <<= 3;
-
         while run_program(a, 0, 0, &stack) != &stack[pos..] {
             a += 1;
         }

@@ -5,8 +5,6 @@ use std::{
 };
 
 fn main() {
-    println!("Hello, world!");
-
     let now = Instant::now();
     p1();
     let elapsed = now.elapsed();
@@ -23,7 +21,7 @@ fn inbounds(x: i32, y: i32, size: u32) -> bool {
 }
 
 fn p1() {
-    let grid: HashSet<(u32, u32)> = fs::read_to_string("./src/input.txt")
+    let grid: HashSet<(i32, i32)> = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
         .trim_end()
         .lines()
@@ -32,7 +30,7 @@ fn p1() {
             let bits = line
                 .split(',')
                 .map(|x| x.parse().unwrap())
-                .collect::<Vec<u32>>();
+                .collect::<Vec<i32>>();
             (bits[0], bits[1])
         })
         .collect();
@@ -41,9 +39,9 @@ fn p1() {
     let start_pos = (0, 0);
     let finish_pos = (70, 70);
 
-    let mut cache: HashMap<(i32, i32), u64> = HashMap::new();
-    let mut stack: VecDeque<((i32, i32), u64)> = VecDeque::new();
-    let mut min: u64 = u64::MAX;
+    let mut cache: HashMap<(i32, i32), u32> = HashMap::new();
+    let mut stack: VecDeque<((i32, i32), u32)> = VecDeque::new();
+    let mut min: u32 = u32::MAX;
     stack.push_back((start_pos, 0));
 
     while let Some((pos, score)) = stack.pop_front() {
@@ -61,9 +59,7 @@ fn p1() {
 
         for &(dy, dx) in &directions {
             let new_pos = (pos.0 + dx, pos.1 + dy);
-            if inbounds(new_pos.1, new_pos.0, 71)
-                && !grid.contains(&(new_pos.0 as u32, new_pos.1 as u32))
-            {
+            if inbounds(new_pos.1, new_pos.0, 71) && !grid.contains(&(new_pos.0, new_pos.1)) {
                 stack.push_back((new_pos, score + 1));
             }
         }
@@ -73,7 +69,7 @@ fn p1() {
 }
 
 fn p2() {
-    let input: Vec<(u32, u32)> = fs::read_to_string("./src/input.txt")
+    let input: Vec<(i32, i32)> = fs::read_to_string("./src/input.txt")
         .expect("Should have been able to read the file")
         .trim_end()
         .lines()
@@ -81,7 +77,7 @@ fn p2() {
             let bits = line
                 .split(',')
                 .map(|x| x.parse().unwrap())
-                .collect::<Vec<u32>>();
+                .collect::<Vec<i32>>();
             (bits[0], bits[1])
         })
         .collect();
@@ -93,11 +89,11 @@ fn p2() {
     let mut cache: HashSet<(i32, i32)> = HashSet::new();
     let mut stack: VecDeque<(i32, i32)> = VecDeque::new();
 
-    let mut blocked: (u32, u32) = (0, 0);
+    let mut blocked: (i32, i32) = (0, 0);
     let mut block_index = 0;
 
-    let mut search_min = 1024;
-    let mut search_max = input.len() as i32;
+    let mut search_min: usize = 1024;
+    let mut search_max: usize = input.len();
 
     loop {
         let mut found = false;
@@ -106,8 +102,7 @@ fn p2() {
         stack.push_back(start_pos);
 
         let search_mid = (search_min + search_max) / 2 + 1;
-        let map_bytes: HashSet<(u32, u32)> =
-            input.iter().take(search_mid as usize).cloned().collect();
+        let map_bytes: HashSet<(i32, i32)> = input.iter().take(search_mid).cloned().collect();
 
         while let Some(pos) = stack.pop_front() {
             if pos == finish_pos {
@@ -123,7 +118,7 @@ fn p2() {
             for &(dy, dx) in &directions {
                 let new_pos = (pos.0 + dx, pos.1 + dy);
                 if inbounds(new_pos.1, new_pos.0, 71)
-                    && !map_bytes.contains(&(new_pos.0 as u32, new_pos.1 as u32))
+                    && !map_bytes.contains(&(new_pos.0, new_pos.1))
                 {
                     stack.push_back(new_pos);
                 }
@@ -137,7 +132,7 @@ fn p2() {
         }
 
         if search_max - search_min <= 1 {
-            blocked = input[search_min as usize];
+            blocked = input[search_min];
             block_index = search_min;
             break;
         }

@@ -46,9 +46,7 @@ fn p1() {
     let mut min: u64 = u64::MAX;
     stack.push_back((start_pos, 0));
 
-    while stack.len() > 0 {
-        let (pos, score) = stack.pop_front().unwrap();
-
+    while let Some((pos, score)) = stack.pop_front() {
         if pos == finish_pos {
             min = min.min(score);
             break;
@@ -111,10 +109,8 @@ fn p2() {
         let map_bytes: HashSet<(u32, u32)> =
             input.iter().take(search_mid as usize).cloned().collect();
 
-        while stack.len() > 0 && !found {
-            let pos = stack.pop_front().unwrap();
-
-            if pos.0 == finish_pos.0 && pos.1 == finish_pos.1 {
+        while let Some(pos) = stack.pop_front() {
+            if pos == finish_pos {
                 found = true;
                 break;
             }

@@ -64,7 +64,6 @@ fn p1() -> u64 {
         }
 
         if grid[pos.0 as usize][pos.1 as usize] == 'E' {
-            // println!("Found it! {}", score);
             min = min.min(score);
             continue;
         }
@@ -131,7 +130,6 @@ fn p2(p1_score: u64) {
         cache.insert((pos.0, pos.1, dir.0, dir.1), score);
 
         if grid[pos.0 as usize][pos.1 as usize] == 'E' {
-            // println!("Found it! {}", score);
             min = min.min(score);
             path_tiles.extend(path);
             continue;

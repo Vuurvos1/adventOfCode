@@ -14,14 +14,14 @@ fn main() {
     println!("p2: {:.2?}", elapsed);
 }
 
-fn step_stone(digit: u64, count: u64, step: u16, cache: &mut HashMap<(u64, u16), u64>) -> u64 {
+fn step_stone(digit: u64, step: u16, cache: &mut HashMap<(u64, u16), u64>) -> u64 {
     if step == 0 {
-        return count + 1;
+        return 1;
     }
 
     if digit == 0 {
         // not caching the 0 - 1 seems to be faster
-        return step_stone(1, count, step - 1, cache);
+        return step_stone(1, step - 1, cache);
     }
 
     if let Some(c) = cache.get(&(digit, step)) {
@@ -35,13 +35,12 @@ fn step_stone(digit: u64, count: u64, step: u16, cache: &mut HashMap<(u64, u16),
         let left = digit / divisor;
         let right = digit % divisor;
 
-        let c =
-            step_stone(left, count, step - 1, cache) + step_stone(right, count, step - 1, cache);
+        let c = step_stone(left, step - 1, cache) + step_stone(right, step - 1, cache);
         cache.insert((digit, step), c);
         return c;
     }
 
-    let c = step_stone(digit * 2024, count, step - 1, cache);
+    let c = step_stone(digit * 2024, step - 1, cache);
     cache.insert((digit, step), c);
     return c;
 }
@@ -57,7 +56,7 @@ fn p1() {
     let mut cache: HashMap<(u64, u16), u64> = HashMap::new();
     let s: u64 = stones
         .iter()
-        .map(|stone| step_stone(*stone, 0, 25, &mut cache))
+        .map(|stone| step_stone(*stone, 25, &mut cache))
         .sum();
 
     println!("Hello, world! {}", s);
@@ -74,7 +73,7 @@ fn p2() {
     let mut cache: HashMap<(u64, u16), u64> = HashMap::new();
     let s: u64 = stones
         .iter()
-        .map(|stone| step_stone(*stone, 0, 75, &mut cache))
+        .map(|stone| step_stone(*stone, 75, &mut cache))
         .sum();
 
     println!("Hello, world! {}", s);

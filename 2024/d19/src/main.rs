@@ -64,8 +64,6 @@ fn towel_permutations(
     patterns: &Vec<String>,
     cache: &mut HashMap<String, u64>,
 ) -> u64 {
-    let mut count = 0;
-
     if towel == "" {
         return 1;
     }
@@ -74,6 +72,7 @@ fn towel_permutations(
         return *c;
     }
 
+    let mut count = 0;
     for pattern in patterns {
         if towel.starts_with(pattern.as_str()) {
             let new_towel = towel.replacen(pattern.as_str(), "", 1);
